@@ -1,0 +1,56 @@
+{
+  "collection": "A&K Kitchen Example — Five Materials",
+  "source": "Actual Materials and Finishes archive supplied by the user",
+  "materials": [
+    {
+      "id": "01",
+      "name": "European Oak",
+      "category": "Natural Veneer",
+      "finish": "Natural matte",
+      "application": "Full-height cabinetry",
+      "image": "materials/01-european-oak-veneer.png",
+      "original_source_filename": "European Oak Veneer.PNG",
+      "note": ""
+    },
+    {
+      "id": "02",
+      "name": "Verde Bamboo",
+      "category": "Natural Stone",
+      "finish": "Honed",
+      "application": "Island and worktop",
+      "image": "materials/02-verde-bamboo-marble.jpg",
+      "original_source_filename": "MB-VERDE BAMBOO.jpg",
+      "note": ""
+    },
+    {
+      "id": "03",
+      "name": "Soft Dunes",
+      "category": "Lacquer Finish",
+      "finish": "Matte",
+      "application": "Tall storage cabinetry",
+      "image": "materials/03-soft-dunes-lacquer.png",
+      "original_source_filename": "Jo-12313-Soft Dunes.png",
+      "note": "Used as the closest approved A&K finish to the prototype label “Bone Lacquer”; the library does not contain a swatch literally named Bone Lacquer."
+    },
+    {
+      "id": "04",
+      "name": "Brushed Champagne",
+      "category": "Metal / PVD Finish",
+      "finish": "Brushed",
+      "application": "Shelving and trims",
+      "image": "materials/04-brushed-champagne-pvd.png",
+      "original_source_filename": "MAKP-2007-Brushed Champagne.PNG",
+      "note": ""
+    },
+    {
+      "id": "05",
+      "name": "Travertine",
+      "category": "Natural Stone",
+      "finish": "Honed",
+      "application": "Flooring",
+      "image": "materials/05-travertine-marble.jpg",
+      "original_source_filename": "MB-TRAVERTINE.jpg",
+      "note": ""
+    }
+  ]
+}
