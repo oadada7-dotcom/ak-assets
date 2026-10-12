@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#F4F1EA">
+<title>A&amp;K Image Selection</title>
+<style>
+/* A&K image approval form. Layout: one quiet column, a numbered image grid,
+   and a single dark action bar pinned to the bottom. Sharp corners throughout. */
+:root {
+  --bone: #f4f1ea;
+  --paper: #fbf9f5;
+  --well: #ebe6dc;
+  --ink: #49413e;
+  --ink-deep: #2b2523;
+  --mute: #6f6a67;
+  --rule: #d9d7d5;
+  --oxblood: #922133;
+  --oxblood-deep: #741a28;
+  --ok: #2e6a4b;
+  --ok-deep: #235239;
+  --font: Optima, "Optima Nova", Candara, "Segoe UI", "Gill Sans", "Trebuchet MS", sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { background: var(--bone); }
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bone);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+button, input { font-family: inherit; border-radius: 0; }
+:focus-visible { outline: 2px solid var(--oxblood); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.wrap { max-width: 1180px; margin-inline: auto; padding-inline: 16px; padding-block: 28px 140px; }
+.center {
+  max-width: 460px; min-height: 100dvh; display: flex; flex-direction: column;
+  justify-content: center; gap: 14px; padding-block: 40px;
+}
+.wordmark { margin: 0; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--oxblood); }
+.title {
+  margin: 0; font-size: clamp(28px, 6vw, 40px); font-weight: 400; line-height: 1.12;
+  color: var(--ink-deep); text-wrap: balance;
+}
+.lede, .note { margin: 0; color: var(--mute); max-width: 60ch; }
+.head {
+  display: flex; flex-direction: column; gap: 10px; padding-bottom: 22px; margin-bottom: 22px;
+  border-bottom: 1px solid var(--rule);
+}
+.gate { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.label { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mute); }
+.input {
+  height: 52px; padding: 0 14px; font-size: 18px; color: var(--ink-deep);
+  background: var(--paper); border: 1px solid var(--ink);
+}
+.error { margin: 0; color: var(--oxblood); }
+.primary, .submit {
+  min-height: 52px; padding: 0 28px; border: 0; background: var(--oxblood); color: #fff;
+  font-size: 15px; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer;
+}
+.primary:disabled, .submit:disabled { opacity: 0.45; cursor: default; }
+.ghost {
+  min-height: 48px; padding: 0 20px; background: transparent; color: var(--ink-deep);
+  border: 1px solid var(--ink); font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+}
+
+.grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (min-width: 720px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; } }
+@media (min-width: 1040px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.tile { position: relative; display: flex; flex-direction: column; min-width: 0; background: var(--paper); border: 1px solid var(--rule); }
+.tile[data-on="true"] { border-color: var(--ok); box-shadow: 0 0 0 2px var(--ok); }
+.pic {
+  position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; padding: 0; border: 0;
+  background: var(--well); cursor: zoom-in;
+}
+div.pic { cursor: default; }
+.pic img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
+.num {
+  position: absolute; top: 0; left: 0; padding: 4px 9px; background: var(--ink-deep); color: #fff;
+  font-size: 13px; letter-spacing: 0.08em; font-variant-numeric: tabular-nums;
+}
+.tick {
+  position: absolute; top: 0; right: 0; width: 30px; height: 30px; display: flex;
+  align-items: center; justify-content: center; background: var(--ok); color: #fff;
+}
+.approve {
+  width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; border-top: 1px solid var(--rule); background: transparent; color: var(--ink-deep);
+  font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
+}
+.approve[aria-pressed="true"] { background: var(--ok); border-top-color: var(--ok); color: #fff; }
+@media (hover: hover) {
+  .primary:hover, .submit:hover { background: var(--oxblood-deep); }
+  .approve:hover { background: var(--well); }
+  .approve[aria-pressed="true"]:hover { background: var(--ok-deep); }
+}
+
+.bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--ink-deep); color: #fff;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+}
+.bar-in { max-width: 1148px; margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.count { margin: 0; min-width: 0; font-size: 15px; font-variant-numeric: tabular-nums; }
+.count strong { font-size: 22px; font-weight: 400; }
+.count small { display: block; font-size: 12px; color: #cfc8c2; }
+.bar .error { color: #f3b9c2; font-size: 13px; margin-top: 8px; max-width: 1148px; margin-inline: auto; }
+.bar .fallback { color: #fff; font-size: 13px; margin: 6px auto 0; max-width: 1148px; overflow-wrap: anywhere; user-select: all; }
+
+.viewer { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; background: #1c1816; color: #fff; }
+.viewer-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.08em;
+}
+.viewer-stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 0 8px; }
+.viewer-stage img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.viewer-ctl {
+  display: grid; grid-template-columns: 60px minmax(0, 1fr) 60px; gap: 8px; max-width: 560px; width: 100%;
+  margin-inline: auto; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+}
+.vbtn {
+  min-height: 54px; border: 1px solid #6b625d; background: transparent; color: #fff; font-size: 14px;
+  letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; gap: 8px;
+}
+.vbtn:disabled { opacity: 0.3; cursor: default; }
+.vbtn[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); }
+.vbtn[aria-pressed="false"] { background: #fff; border-color: #fff; color: var(--ink-deep); }
+
+.done-mark { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; background: var(--ok); color: #fff; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.numbers {
+  margin: 0; padding: 14px 16px; background: var(--paper); border: 1px solid var(--rule);
+  font-variant-numeric: tabular-nums; letter-spacing: 0.04em; overflow-wrap: anywhere; user-select: all;
+}
+.cap { padding: 8px 10px 10px; border-top: 1px solid var(--rule); min-width: 0; }
+.cap b { display: block; font-weight: 400; font-size: 17px; color: var(--ink-deep); font-variant-numeric: tabular-nums; }
+.cap span { display: block; font-size: 11px; color: var(--mute); overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: no-preference) {
+  .approve, .primary, .submit, .vbtn { transition: background-color 120ms ease, color 120ms ease; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+const CFG = {"salt":"2ygaEWd/zXdlwn3BRkFJZQ==","iter":250000,"total":98,"v":"fe5e65e8"};
+const app = document.getElementById("app");
+const CHECK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg>';
+
+let KEY = null;          // AES key, derived from the passcode
+let MAN = null;          // decrypted manifest: { images: [{n,w,h,name}], mail }
+let SEL = new Set();     // approved image numbers
+let sending = false;
+let failures = 0;
+const thumbs = new Map(); // n -> Promise<{ bytes, url }>
+const fulls = new Map();  // n -> Promise<string>
+
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const kid of kids.flat()) {
+    if (kid == null || kid === false) continue;
+    el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  }
+  return el;
+}
+const pad = (n) => String(n).padStart(CFG.total > 99 ? 3 : 2, "0");
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch { /* convenience only */ } },
+};
+const SEL_KEY = "ak-sel:" + CFG.v;
+const PASS_KEY = "ak-pass:" + CFG.v;
+
+/* ---------- crypto ---------- */
+const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+async function deriveKey(pass) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass.trim().toLowerCase()), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: b64(CFG.salt), iterations: CFG.iter, hash: "SHA-256" },
+    base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+}
+async function fetchBytes(name) {
+  const r = await fetch("d/" + name + ".bin?v=" + CFG.v);
+  if (!r.ok) throw new Error("network");
+  return new Uint8Array(await r.arrayBuffer());
+}
+async function decrypt(buf, key) {
+  return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: buf.subarray(0, 12) }, key, buf.subarray(12)));
+}
+const openFile = async (name) => decrypt(await fetchBytes(name), KEY);
+
+function thumb(n) {
+  if (!thumbs.has(n)) {
+    const p = openFile("t" + n).then((bytes) => ({ bytes, url: URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" })) }));
+    p.catch(() => thumbs.delete(n));
+    thumbs.set(n, p);
+  }
+  return thumbs.get(n);
+}
+function full(n) {
+  if (!fulls.has(n)) {
+    const p = openFile("f" + n).then((bytes) => URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" })));
+    p.catch(() => fulls.delete(n));
+    fulls.set(n, p);
+  }
+  return fulls.get(n);
+}
+
+/* ---------- gate ---------- */
+async function unlock(pass) {
+  const key = await deriveKey(pass);
+  const sealed = await fetchBytes("m");        // throws "network" if offline
+  let plain;
+  try { plain = await decrypt(sealed, key); } catch { throw new Error("wrong"); }
+  KEY = key;
+  MAN = JSON.parse(new TextDecoder().decode(plain));
+  store.set(PASS_KEY, pass.trim().toLowerCase());
+}
+
+function shell(...kids) {
+  return h("main", { class: "wrap center" }, h("p", { class: "wordmark" }, "Adada & Kabbani"), ...kids);
+}
+
+function showGate(message) {
+  const input = h("input", { id: "code", class: "input", autocomplete: "off", autocapitalize: "none", autocorrect: "off", spellcheck: "false", "aria-describedby": "code-error" });
+  const error = h("p", { id: "code-error", class: "error", role: "alert", hidden: !message }, message || "");
+  const button = h("button", { class: "primary", type: "submit" }, "Continue");
+  const form = h("form", { class: "gate", onsubmit: async (e) => {
+    e.preventDefault();
+    if (!input.value.trim() || button.disabled) return;
+    button.disabled = true; button.textContent = "Checking"; error.hidden = true;
+    try {
+      await unlock(input.value);
+      start();
+    } catch (err) {
+      error.textContent = err.message === "wrong" ? "That passcode is not correct." : "The page could not load. Check your connection and try again.";
+      error.hidden = false; button.disabled = false; button.textContent = "Continue";
+    }
+  } }, h("label", { class: "label", for: "code" }, "Passcode"), input, error, button);
+  app.replaceChildren(shell(
+    h("h1", { class: "title" }, location.hash.startsWith("#r-") ? "Approved images" : "Image selection"),
+    h("p", { class: "lede" }, "Enter the passcode to view the images."), form));
+}
+
+/* ---------- selection ---------- */
+const approved = () => MAN.images.filter((i) => SEL.has(i.n));
+function saveSel() { store.set(SEL_KEY, JSON.stringify([...SEL])); }
+
+let barCount, barHint, barSubmit, barError, barFallback, tiles = new Map(), viewerState = null;
+const io = "IntersectionObserver" in window ? new IntersectionObserver((entries) => {
+  for (const entry of entries) {
+    if (!entry.isIntersecting) continue;
+    io.unobserve(entry.target);
+    loadThumb(entry.target);
+  }
+}, { rootMargin: "700px 0px" }) : null;
+function loadThumb(img) {
+  thumb(Number(img.dataset.n)).then((t) => { img.src = t.url; }).catch(() => { if (io) setTimeout(() => io.observe(img), 3000); });
+}
+
+function paintTile(n) {
+  const t = tiles.get(n);
+  if (!t) return;
+  const on = SEL.has(n);
+  t.li.dataset.on = String(on);
+  t.tick.hidden = !on;
+  t.btn.setAttribute("aria-pressed", String(on));
+  t.btn.setAttribute("aria-label", on ? `Image ${pad(n)} approved. Tap to undo.` : `Approve image ${pad(n)}`);
+  t.btn.innerHTML = on ? CHECK + "Approved" : "Approve";
+}
+function paintBar() {
+  const count = approved().length;
+  barCount.textContent = String(count);
+  barHint.textContent = count ? "Press Submit when you are finished" : "Approve at least one image";
+  barSubmit.disabled = !count || sending;
+  barSubmit.textContent = sending ? "Sending" : "Submit";
+}
+function toggle(n) {
+  if (sending) return;
+  if (SEL.has(n)) SEL.delete(n); else SEL.add(n);
+  saveSel(); paintTile(n); paintBar();
+  barError.hidden = true;
+  if (viewerState) paintViewer();
+}
+
+function showSelection() {
+  tiles = new Map();
+  const grid = h("ul", { class: "grid" });
+  MAN.images.forEach((img, index) => {
+    const pic = h("img", { alt: `Image ${pad(img.n)}`, width: img.w, height: img.h, "data-n": img.n, decoding: "async" });
+    const tick = h("span", { class: "tick", html: CHECK, hidden: true });
+    const btn = h("button", { type: "button", class: "approve", id: "approve-" + img.n, onclick: () => toggle(img.n) });
+    const li = h("li", { class: "tile" },
+      h("button", { type: "button", class: "pic", "aria-label": `View image ${pad(img.n)} larger`, onclick: () => openViewer(index) },
+        pic, h("span", { class: "num" }, pad(img.n)), tick),
+      btn);
+    tiles.set(img.n, { li, tick, btn });
+    grid.append(li);
+    paintTile(img.n);
+    if (io) io.observe(pic); else loadThumb(pic);
+  });
+
+  barCount = h("strong", {});
+  barHint = h("small", {});
+  barSubmit = h("button", { type: "button", id: "submit", class: "submit", onclick: submit });
+  barError = h("p", { class: "error", role: "alert", hidden: true });
+  barFallback = h("p", { class: "fallback", hidden: true });
+  const bar = h("div", { class: "bar" },
+    h("div", { class: "bar-in" },
+      h("p", { class: "count", "aria-live": "polite" }, barCount, ` of ${CFG.total} approved`, barHint),
+      barSubmit),
+    barError, barFallback);
+
+  app.replaceChildren(
+    h("main", { class: "wrap" },
+      h("header", { class: "head" },
+        h("p", { class: "wordmark" }, "Adada & Kabbani"),
+        h("h1", { class: "title" }, "Image selection"),
+        h("p", { class: "lede" }, "Tap Approve under each image you want to use. Tap an image to see it larger. When you are finished, press Submit at the bottom.")),
+      grid),
+    bar);
+  paintBar();
+}
+
+/* ---------- viewer ---------- */
+function openViewer(index) {
+  const img = h("img", { alt: "" });
+  const counter = h("span", {});
+  const prev = h("button", { type: "button", class: "vbtn", "aria-label": "Previous image", onclick: () => moveViewer(-1) }, "←");
+  const next = h("button", { type: "button", class: "vbtn", "aria-label": "Next image", onclick: () => moveViewer(1) }, "→");
+  const approveBtn = h("button", { type: "button", class: "vbtn", id: "viewer-approve", onclick: () => toggle(MAN.images[viewerState.index].n) });
+  let touchX = null;
+  const stage = h("div", { class: "viewer-stage",
+    ontouchstart: (e) => { touchX = e.touches[0] ? e.touches[0].clientX : null; },
+    ontouchend: (e) => {
+      if (touchX === null) return;
+      const dx = (e.changedTouches[0] ? e.changedTouches[0].clientX : touchX) - touchX;
+      touchX = null;
+      if (Math.abs(dx) > 48) moveViewer(dx < 0 ? 1 : -1);
+    } }, img);
+  const el = h("div", { class: "viewer", role: "dialog", "aria-modal": "true" },
+    h("div", { class: "viewer-top" }, counter,
+      h("button", { type: "button", class: "vbtn", id: "viewer-close", style: "min-height:40px;padding:0 16px", onclick: closeViewer }, "Close")),
+    stage,
+    h("div", { class: "viewer-ctl" }, prev, approveBtn, next));
+  viewerState = { index, el, img, counter, prev, next, approveBtn, overflow: document.body.style.overflow };
+  document.body.style.overflow = "hidden";
+  document.body.append(el);
+  paintViewer(true);
+}
+function paintViewer(imageChanged) {
+  const v = viewerState;
+  const item = MAN.images[v.index];
+  const on = SEL.has(item.n);
+  v.counter.textContent = `${pad(item.n)} / ${pad(CFG.total)}`;
+  v.el.setAttribute("aria-label", `Image ${pad(item.n)}`);
+  v.prev.disabled = v.index === 0;
+  v.next.disabled = v.index === MAN.images.length - 1;
+  v.approveBtn.setAttribute("aria-pressed", String(on));
+  v.approveBtn.innerHTML = on ? CHECK + "Approved" : "Approve";
+  if (!imageChanged) return;
+  const shown = v.index;
+  v.img.alt = `Image ${pad(item.n)}`;
+  thumb(item.n).then((t) => { if (viewerState && viewerState.index === shown && !v.img.dataset.full) v.img.src = t.url; }).catch(() => {});
+  delete v.img.dataset.full;
+  full(item.n).then((url) => { if (viewerState && viewerState.index === shown) { v.img.src = url; v.img.dataset.full = "1"; } }).catch(() => {});
+}
+function moveViewer(step) {
+  const next = viewerState.index + step;
+  if (next < 0 || next >= MAN.images.length) return;
+  viewerState.index = next;
+  paintViewer(true);
+}
+function closeViewer() {
+  if (!viewerState) return;
+  document.body.style.overflow = viewerState.overflow;
+  viewerState.el.remove();
+  viewerState = null;
+}
+window.addEventListener("keydown", (e) => {
+  if (!viewerState) return;
+  if (e.key === "Escape") closeViewer();
+  if (e.key === "ArrowRight") moveViewer(1);
+  if (e.key === "ArrowLeft") moveViewer(-1);
+});
+
+/* ---------- contact sheet PDF ---------- */
+function jpegInfo(b) {
+  if (b[0] !== 0xff || b[1] !== 0xd8) return null;
+  let p = 2;
+  while (p + 9 < b.length) {
+    if (b[p] !== 0xff) { p += 1; continue; }
+    const m = b[p + 1];
+    if (m === 0xff) { p += 1; continue; }
+    if (m === 0xd8 || m === 0x01 || (m >= 0xd0 && m <= 0xd7)) { p += 2; continue; }
+    const len = (b[p + 2] << 8) | b[p + 3];
+    if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) {
+      return { h: (b[p + 5] << 8) | b[p + 6], w: (b[p + 7] << 8) | b[p + 8], comps: b[p + 9] };
+    }
+    p += 2 + len;
+  }
+  return null;
+}
+function buildSheetPdf(items, meta) {
+  const PAGE_W = 841.89, PAGE_H = 595.28, M = 36, COLS = 4, ROWS = 2, GAP = 14;
+  const enc = new TextEncoder();
+  const parts = [], offsets = [];
+  let size = 0;
+  const push = (d) => { const bytes = typeof d === "string" ? enc.encode(d) : d; parts.push(bytes); size += bytes.length; };
+  const object = (id, dict, stream) => {
+    offsets[id] = size;
+    push(`${id} 0 obj\n${dict}\n`);
+    if (stream) { push("stream\n"); push(stream); push("\nendstream\n"); }
+    push("endobj\n");
+  };
+  const text = (s) => String(s).replace(/[^\x20-\x7e]/g, "?").replace(/([\\()])/g, "\\$1");
+  const f = (n) => n.toFixed(2);
+  const images = items.map((it) => { const info = jpegInfo(it.jpeg); return { ...it, w: info ? info.w : it.w, h: info ? info.h : it.h, comps: info ? info.comps : 3 }; });
+  const perPage = COLS * ROWS;
+  const pageCount = Math.max(1, Math.ceil(images.length / perPage));
+  const imageId = (i) => 5 + i;
+  const contentId = (p) => 5 + images.length + p * 2;
+  const pageId = (p) => 6 + images.length + p * 2;
+
+  push("%PDF-1.4\n");
+  push(new Uint8Array([0x25, 0xe2, 0xe3, 0xcf, 0xd3, 0x0a]));
+  object(1, "<< /Type /Catalog /Pages 2 0 R >>");
+  object(2, `<< /Type /Pages /Count ${pageCount} /Kids [${Array.from({ length: pageCount }, (_, p) => `${pageId(p)} 0 R`).join(" ")}] >>`);
+  object(3, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
+  object(4, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
+  images.forEach((img, i) => {
+    const space = img.comps === 1 ? "/DeviceGray" : img.comps === 4 ? "/DeviceCMYK" : "/DeviceRGB";
+    object(imageId(i), `<< /Type /XObject /Subtype /Image /Width ${img.w} /Height ${img.h} /ColorSpace ${space} /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.jpeg.length} >>`, img.jpeg);
+  });
+  const cellW = (PAGE_W - 2 * M - (COLS - 1) * GAP) / COLS;
+  const top = PAGE_H - 88, bottom = 28;
+  const rowH = (top - bottom - (ROWS - 1) * GAP) / ROWS;
+  const boxH = rowH - 30;
+  for (let p = 0; p < pageCount; p += 1) {
+    const onPage = images.slice(p * perPage, (p + 1) * perPage);
+    let c = "";
+    c += `BT /F2 10 Tf 2.4 Tc 0.573 0.129 0.2 rg 1 0 0 1 ${f(M)} ${f(PAGE_H - 46)} Tm (${text(meta.heading)}) Tj ET\n`;
+    c += `BT /F1 9 Tf 0 Tc 0.38 0.36 0.35 rg 1 0 0 1 ${f(M)} ${f(PAGE_H - 62)} Tm (${text(meta.sub)}) Tj ET\n`;
+    c += `BT /F1 9 Tf 0 Tc 0.49 0.49 0.486 rg 1 0 0 1 ${f(PAGE_W - M - 58)} ${f(PAGE_H - 46)} Tm (Page ${p + 1} of ${pageCount}) Tj ET\n`;
+    c += `0.85 0.843 0.835 RG 0.5 w ${f(M)} ${f(PAGE_H - 73)} m ${f(PAGE_W - M)} ${f(PAGE_H - 73)} l S\n`;
+    onPage.forEach((img, k) => {
+      const x = M + (k % COLS) * (cellW + GAP);
+      const yTop = top - Math.floor(k / COLS) * (rowH + GAP);
+      const scale = Math.min(cellW / img.w, boxH / img.h);
+      const dw = img.w * scale, dh = img.h * scale, y = yTop - dh;
+      c += `q ${f(dw)} 0 0 ${f(dh)} ${f(x)} ${f(y)} cm /Im${p * perPage + k} Do Q\n`;
+      c += `BT /F2 11 Tf 0.4 Tc 0.169 0.145 0.137 rg 1 0 0 1 ${f(x)} ${f(y - 15)} Tm (${text(img.label)}) Tj ET\n`;
+      if (img.caption) c += `BT /F1 6 Tf 0 Tc 0.49 0.49 0.486 rg 1 0 0 1 ${f(x)} ${f(y - 24)} Tm (${text(img.caption.slice(0, 56))}) Tj ET\n`;
+    });
+    const stream = enc.encode(c);
+    object(contentId(p), `<< /Length ${stream.length} >>`, stream);
+    const xobjects = onPage.map((_, k) => `/Im${p * perPage + k} ${imageId(p * perPage + k)} 0 R`).join(" ");
+    object(pageId(p), `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PAGE_W} ${PAGE_H}] /Contents ${contentId(p)} 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /XObject << ${xobjects} >> >> >>`);
+  }
+  const count = 4 + images.length + pageCount * 2;
+  const xref = size;
+  let table = `xref\n0 ${count + 1}\n0000000000 65535 f \n`;
+  for (let id = 1; id <= count; id += 1) table += `${String(offsets[id]).padStart(10, "0")} 00000 n \n`;
+  push(table);
+  push(`trailer\n<< /Size ${count + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  return new Blob(parts, { type: "application/pdf" });
+}
+async function makeSheet(picked) {
+  const items = new Array(picked.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < picked.length) {
+      const i = next; next += 1;
+      const img = picked[i];
+      const t = await thumb(img.n);
+      items[i] = { label: pad(img.n), caption: img.name, jpeg: t.bytes, w: img.w, h: img.h };
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(6, picked.length) }, worker));
+  const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  return buildSheetPdf(items, { heading: "ADADA & KABBANI", sub: `Approved images   |   ${picked.length} of ${CFG.total} approved   |   ${date}` });
+}
+
+/* ---------- submit ---------- */
+async function sendEmail(picked, pdf) {
+  const base = location.origin + location.pathname;
+  const fields = {
+    _subject: `A&K image selection: ${picked.length} of ${CFG.total} approved`,
+    _template: "table",
+    _captcha: "false",
+    "Approved images": picked.map((i) => pad(i.n)).join(", "),
+    "Count": `${picked.length} of ${CFG.total}`,
+    "Contact sheet": `${base}#r-${picked.map((i) => i.n).join(".")}`,
+    "Submitted": new Date().toLocaleString("en-GB", { timeZone: "Asia/Riyadh" }) + " (Riyadh time)",
+  };
+  const read = async (response) => {
+    const data = await response.json().catch(() => null);
+    return { ok: response.ok && !!data && String(data.success) === "true", message: String((data && data.message) || response.status) };
+  };
+  let first = null;
+  if (pdf) {
+    try {
+      const form = new FormData();
+      for (const [k, v] of Object.entries(fields)) form.append(k, v);
+      form.append("attachment", new File([pdf], "AK-approved-images.pdf", { type: "application/pdf" }));
+      first = await read(await fetch(MAN.mail, { method: "POST", headers: { Accept: "application/json" }, body: form }));
+      if (first.ok) return { ok: true, how: "attachment" };
+    } catch (e) { first = { ok: false, message: e.message }; }
+  }
+  const second = await read(await fetch(MAN.mail, {
+    method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(fields) }));
+  return { ok: second.ok, how: "links", message: second.message, first: first && first.message };
+}
+
+async function submit() {
+  const picked = approved();
+  if (!picked.length || sending) return;
+  sending = true; paintBar();
+  barError.hidden = true; barFallback.hidden = true;
+  try {
+    let pdf = null;
+    try { pdf = await makeSheet(picked); } catch { pdf = null; }
+    const result = await sendEmail(picked, pdf);
+    window.__lastSend = result;
+    if (!result.ok) throw new Error(result.message || "send failed");
+    failures = 0;
+    sending = false;
+    closeViewer();
+    showDone(picked.length);
+  } catch (e) {
+    window.__lastSend = window.__lastSend || { ok: false, message: e.message };
+    failures += 1;
+    sending = false; paintBar();
+    barError.textContent = "The selection was not sent. Check your connection and press Submit again.";
+    barError.hidden = false;
+    if (failures >= 2) {
+      barFallback.textContent = "Still not sending? Send these numbers to Omar: " + picked.map((i) => pad(i.n)).join(", ");
+      barFallback.hidden = false;
+    }
+  }
+}
+
+function showDone(count) {
+  app.replaceChildren(shell(
+    h("div", { class: "done-mark", html: CHECK.replace(/18/g, "30") }),
+    h("h1", { class: "title" }, "Sent. Thank you."),
+    h("p", { class: "lede" }, `${count} of ${CFG.total} images approved and sent to Omar.`),
+    h("div", {}, h("button", { class: "ghost", onclick: showSelection }, "Change the selection"))));
+  window.scrollTo(0, 0);
+}
+
+/* ---------- contact sheet view (link in the email) ---------- */
+function showResult(numbers) {
+  const wanted = new Set(numbers);
+  const picked = MAN.images.filter((i) => wanted.has(i.n));
+  const list = picked.map((i) => pad(i.n)).join(", ");
+  const error = h("p", { class: "error", role: "alert", hidden: true });
+  const download = h("button", { class: "primary", id: "download", onclick: async () => {
+    if (download.disabled) return;
+    download.disabled = true; download.textContent = "Building"; error.hidden = true;
+    try {
+      const url = URL.createObjectURL(await makeSheet(picked));
+      const link = h("a", { href: url, download: "AK-approved-images.pdf" });
+      document.body.append(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch {
+      error.textContent = "The contact sheet could not be built. Check your connection and try again."; error.hidden = false;
+    }
+    download.disabled = false; download.textContent = "Download contact sheet PDF";
+  } }, "Download contact sheet PDF");
+  const copy = h("button", { class: "ghost", onclick: () => {
+    navigator.clipboard.writeText(list).then(() => { copy.textContent = "Copied"; }).catch(() => {});
+  } }, "Copy the numbers");
+  const grid = h("ul", { class: "grid" });
+  for (const img of picked) {
+    const pic = h("img", { alt: `Image ${pad(img.n)}`, width: img.w, height: img.h, "data-n": img.n });
+    grid.append(h("li", { class: "tile" }, h("div", { class: "pic" }, pic),
+      h("div", { class: "cap" }, h("b", {}, pad(img.n)), h("span", {}, img.name))));
+    if (io) io.observe(pic); else loadThumb(pic);
+  }
+  app.replaceChildren(h("main", { class: "wrap", style: "padding-bottom:60px" },
+    h("header", { class: "head" },
+      h("p", { class: "wordmark" }, "Adada & Kabbani"),
+      h("h1", { class: "title" }, "Approved images"),
+      h("p", { class: "lede" }, `${picked.length} of ${CFG.total} approved.`),
+      h("p", { class: "numbers" }, list),
+      h("div", { class: "actions" }, download, copy),
+      error),
+    grid));
+}
+
+/* ---------- boot ---------- */
+function start() {
+  const m = location.hash.match(/^#r-([\d.]+)$/);
+  if (m) { showResult(m[1].split(".").map(Number).filter(Boolean)); return; }
+  try {
+    const saved = JSON.parse(store.get(SEL_KEY) || "[]");
+    const valid = new Set(MAN.images.map((i) => i.n));
+    SEL = new Set(Array.isArray(saved) ? saved.filter((n) => valid.has(n)) : []);
+  } catch { SEL = new Set(); }
+  showSelection();
+}
+window.addEventListener("hashchange", () => { if (KEY) { closeViewer(); start(); } });
+(async () => {
+  if (!window.crypto || !crypto.subtle) {
+    app.replaceChildren(shell(h("h1", { class: "title" }, "Image selection"), h("p", { class: "lede" }, "This browser cannot open the page. Please open the link in Safari or Chrome.")));
+    return;
+  }
+  const remembered = store.get(PASS_KEY);
+  if (remembered) {
+    app.replaceChildren(shell(h("p", { class: "note" }, "Loading")));
+    try { await unlock(remembered); start(); return; } catch { /* fall through to the gate */ }
+  }
+  showGate();
+})();
+</script>
+</body>
+</html>
