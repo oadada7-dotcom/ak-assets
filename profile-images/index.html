@@ -85,6 +85,11 @@ button, input { font: inherit; }
   display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 28px rgba(46, 106, 75, 0.35);
 }
 .card .ghost { margin-top: 28px; }
+a.ghost { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.stack { align-self: stretch; display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+.stack .ghost, .card .stack .ghost { margin-top: 0; height: 50px; }
+.sheet-text { margin-top: 18px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13.5px; }
+.note.small { margin-top: 14px; font-size: 13px; line-height: 1.45; }
 .note { margin: 0; color: var(--mute); }
 
 /* selection */
@@ -384,7 +389,9 @@ function showGate(message) {
 const approved = () => MAN.images.filter((i) => SEL.has(i.n));
 function saveSel() { store.set(SEL_KEY, JSON.stringify([...SEL])); }
 
-let barCount, barHint, barSubmit, barError, barFallback, tiles = new Map(), secUI = [], viewerState = null;
+let barCount, barHint, barSubmit, barError, tiles = new Map(), secUI = [], viewerState = null;
+const SEND_MS = 20000;   // attachment request: base time limit, plus 10 s per MB of PDF
+const LINKS_MS = 12000;  // links-only request (8 s when the attachment request already timed out)
 const io = "IntersectionObserver" in window ? new IntersectionObserver((entries) => {
   for (const entry of entries) {
     if (!entry.isIntersecting) continue;
@@ -420,7 +427,7 @@ function paintSection(si) {
 function paintBar() {
   const count = approved().length;
   barCount.textContent = String(count);
-  barHint.textContent = count ? "Press Submit when you are finished" : "Approve at least one image";
+  barHint.textContent = sending ? "Sending to Omar. This can take up to a minute." : count ? "Press Submit when you are finished" : "Approve at least one image";
   barSubmit.disabled = !count || sending;
   barSubmit.textContent = sending ? "Sending" : "Submit";
 }
@@ -478,12 +485,11 @@ function showSelection() {
   barHint = h("small", {});
   barSubmit = h("button", { type: "button", id: "submit", class: "submit", onclick: submit });
   barError = h("p", { class: "error", role: "alert", hidden: true });
-  barFallback = h("p", { class: "fallback", hidden: true });
   const bar = h("div", { class: "bar" },
     h("div", { class: "bar-in" },
       h("p", { class: "count", "aria-live": "polite" }, barCount, ` of ${CFG.total} approved`, barHint),
       barSubmit),
-    barError, barFallback);
+    barError);
 
   app.replaceChildren(
     h("main", { class: "wrap" },
@@ -798,18 +804,23 @@ async function sendEmail(picked, pdf) {
     const data = await response.json().catch(() => null);
     return { ok: response.ok && !!data && String(data.success) === "true", message: String((data && data.message) || response.status) };
   };
+  // The relay sometimes stops answering; never wait on it for ever.
+  const post = async (body, headers, ms) => {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), ms);
+    try { return await read(await fetch(MAN.mail, { method: "POST", headers, body, signal: ctl.signal })); }
+    catch (e) { return { ok: false, message: e && e.name === "AbortError" ? "timeout" : String((e && e.message) || e) }; }
+    finally { clearTimeout(timer); }
+  };
   let first = null;
   if (pdf) {
-    try {
-      const form = new FormData();
-      for (const [k, v] of Object.entries(fields)) form.append(k, v);
-      form.append("attachment", new File([pdf], "Adada-Kabbani-approved-project-images.pdf", { type: "application/pdf" }));
-      first = await read(await fetch(MAN.mail, { method: "POST", headers: { Accept: "application/json" }, body: form }));
-      if (first.ok) return { ok: true, how: "attachment" };
-    } catch (e) { first = { ok: false, message: e.message }; }
+    const form = new FormData();
+    for (const [k, v] of Object.entries(fields)) form.append(k, v);
+    form.append("attachment", new File([pdf], "Adada-Kabbani-approved-project-images.pdf", { type: "application/pdf" }));
+    first = await post(form, { Accept: "application/json" }, SEND_MS + Math.round((pdf.size / 1e6) * 10000));
+    if (first.ok) return { ok: true, how: "attachment" };
   }
-  const second = await read(await fetch(MAN.mail, {
-    method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(fields) }));
+  const second = await post(JSON.stringify(fields), { "Content-Type": "application/json", Accept: "application/json" }, first && first.message === "timeout" ? 8000 : LINKS_MS);
   return { ok: second.ok, how: "links", message: second.message, first: first && first.message };
 }
 
@@ -817,28 +828,52 @@ async function submit() {
   const picked = approved();
   if (!picked.length || sending) return;
   sending = true; paintBar();
-  barError.hidden = true; barFallback.hidden = true;
+  barError.hidden = true;
+  let result;
   try {
     let pdf = null;
     try { pdf = await makeSheetForEmail(picked); } catch { pdf = null; }
-    const result = await sendEmail(picked, pdf);
-    window.__lastSend = result;
-    if (!result.ok) throw new Error(result.message || "send failed");
-    failures = 0;
-    sending = false;
-    closeViewer();
-    showDone(picked.length);
+    result = await sendEmail(picked, pdf);
   } catch (e) {
-    window.__lastSend = window.__lastSend || { ok: false, message: e.message };
-    failures += 1;
-    sending = false; paintBar();
-    barError.textContent = "The selection was not sent. Check your connection and press Submit again.";
-    barError.hidden = false;
-    if (failures >= 2) {
-      barFallback.textContent = "Still not sending? Send these numbers to Omar: " + numberLines(picked).map((l) => `${l.title}: ${l.nums}`).join("; ");
-      barFallback.hidden = false;
-    }
+    result = { ok: false, message: String((e && e.message) || e) };
   }
+  window.__lastSend = result;
+  sending = false;
+  closeViewer();
+  if (result.ok) { failures = 0; showDone(picked.length); return; }
+  failures += 1;
+  showNotSent(picked, result);
+}
+
+/* sending failed: try again, or hand the selection to the mail app */
+function selectionText(picked) {
+  return [`Approved project images: ${picked.length} of ${CFG.total}`, "",
+    ...numberLines(picked).map((l) => `${l.title}: ${l.nums}`), "",
+    `Contact sheet: ${location.origin + location.pathname}#r-${encodeSel(picked)}`].join("\n");
+}
+function mailAddress() {
+  try { const a = decodeURIComponent(String(MAN.mail).split("/").pop()); return /^[^@\s/]+@[^@\s/]+\.[^@\s/]+$/.test(a) ? a : null; } catch { return null; }
+}
+function showNotSent(picked, result) {
+  const text = selectionText(picked);
+  const to = mailAddress();
+  const subject = `Adada & Kabbani project images: ${picked.length} of ${CFG.total} approved`;
+  const mail = to ? h("a", { class: "ghost", id: "mail-selection",
+    href: `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text.replace(/\n/g, "\r\n"))}` }, "Email the selection") : null;
+  const detail = result && result.message && !/^(timeout|Failed to fetch|Load failed|NetworkError.*)$/i.test(result.message) && result.message.length < 240 ? result.message : null;
+  app.replaceChildren(card(
+    h("h1", { class: "title" }, "Not sent yet"),
+    h("p", { class: "lede" }, to
+      ? "The email service did not respond. Press Try again, or send your selection to Omar from your mail app."
+      : "The email service did not respond. Press Try again in a minute."),
+    h("p", { class: "numbers sheet-text" }, text),
+    h("div", { class: "stack" },
+      h("button", { class: "primary", type: "button", id: "retry", onclick: () => { showSelection(); submit(); } }, "Try again"),
+      mail,
+      h("button", { class: "ghost", type: "button", onclick: showSelection }, "Back to the images")),
+    to ? h("p", { class: "note small" }, "If you use Email the selection, you are done once your mail app has sent it.") : null,
+    detail ? h("p", { class: "note small" }, "Service reply: " + detail) : null));
+  window.scrollTo(0, 0);
 }
 
 function showDone(count) {
