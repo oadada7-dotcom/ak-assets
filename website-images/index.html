@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#E6DED3">
+<title>Adada &amp; Kabbani · Images for the website</title>
+<style>
+/* Adada & Kabbani project image approval. Frosted-glass panels over a blurred
+   atrium photograph; one section per project; a floating glass bar with Submit. */
+:root {
+  --ink-deep: #2b2523;
+  --ink: #49413e;
+  --mute: #6a6461;
+  --oxblood: #922133;
+  --oxblood-deep: #741a28;
+  --ok: #2e6a4b;
+  --ok-deep: #235239;
+  --glass: rgba(255, 255, 255, 0.42);
+  --glass-line: rgba(255, 255, 255, 0.7);
+  --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 12px 36px rgba(43, 37, 35, 0.10);
+  --font: Optima, "Optima Nova", Candara, "Segoe UI", "Gill Sans", "Trebuchet MS", sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { background: #e6ded3; }
+body {
+  margin: 0;
+  min-height: 100dvh;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1;
+  background: #e6ded3 url(bg-land.jpg) center / cover no-repeat;
+}
+@media (max-aspect-ratio: 1/1) { body::before { background-image: url(bg-port.jpg); } }
+button, input { font: inherit; }
+:focus-visible { outline: 2px solid var(--oxblood); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.glass { background: var(--glass); border: 1px solid var(--glass-line); box-shadow: var(--glass-shadow); }
+.logo { display: block; height: 30px; width: auto; }
+.title { margin: 0; font-size: clamp(30px, 5vw, 40px); font-weight: 400; line-height: 1.1; color: var(--ink-deep); text-wrap: balance; }
+.lede { margin: 0; font-size: 15.5px; color: var(--mute); max-width: 66ch; }
+.error { margin: 0; color: var(--oxblood); font-size: 14.5px; }
+
+/* buttons */
+.primary, .submit {
+  border: 0; border-radius: 999px; background: var(--oxblood); color: #fff; cursor: pointer;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 8px 20px rgba(146, 33, 51, 0.28);
+}
+.primary { height: 54px; padding: 0 28px; font-size: 14px; }
+.primary:disabled, .submit:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
+.ghost, .all {
+  border-radius: 999px; border: 1px solid rgba(73, 65, 62, 0.28); background: rgba(255, 255, 255, 0.5);
+  color: var(--ink-deep); cursor: pointer; text-transform: uppercase; white-space: nowrap;
+}
+.ghost { height: 50px; padding: 0 26px; font-size: 13px; letter-spacing: 0.16em; }
+.all { height: 42px; padding: 0 20px; font-size: 12px; letter-spacing: 0.16em; }
+
+/* passcode, sent */
+.center { min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
+.card { width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: flex-start; padding: 40px; border-radius: 28px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 24px 64px rgba(43, 37, 35, 0.14); }
+.card .logo { height: 34px; }
+.card .title { margin-top: 28px; font-size: clamp(30px, 6vw, 36px); }
+.card .lede { margin-top: 10px; font-size: 16px; }
+.gate { align-self: stretch; display: flex; flex-direction: column; gap: 10px; margin-top: 26px; }
+.label { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mute); }
+.input {
+  height: 54px; padding: 0 16px; border-radius: 16px; border: 1px solid rgba(73, 65, 62, 0.24);
+  background: rgba(255, 255, 255, 0.62); box-shadow: inset 0 1px 2px rgba(43, 37, 35, 0.06);
+  font-size: 18px; color: var(--ink-deep); outline: none;
+}
+.input:focus { border-color: var(--oxblood); }
+.gate .primary { margin-top: 8px; }
+.done-mark {
+  margin-top: 32px; width: 64px; height: 64px; border-radius: 999px; background: var(--ok); color: #fff;
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 28px rgba(46, 106, 75, 0.35);
+}
+.card .ghost { margin-top: 28px; }
+a.ghost { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.stack { align-self: stretch; display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+.stack .ghost, .card .stack .ghost { margin-top: 0; height: 50px; }
+.sheet-text { margin-top: 18px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13.5px; }
+.note.small { margin-top: 14px; font-size: 13px; line-height: 1.45; }
+.note { margin: 0; color: var(--mute); }
+
+/* selection */
+.wrap { max-width: 1212px; margin-inline: auto; padding: 32px 16px 150px; }
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; padding: 24px 32px; border-radius: 28px; }
+.head-main { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.head-main .logo { margin-bottom: 10px; }
+.chip {
+  flex: none; padding: 7px 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.8); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.section { margin-top: 36px; scroll-margin-top: 16px; }
+.sec-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 16px 16px 26px; border-radius: 22px; margin-bottom: 16px; }
+.sec-titles { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.eyebrow { margin: 0; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mute); font-variant-numeric: tabular-nums; }
+.sec-name { margin: 0; font-size: 24px; line-height: 1.15; font-weight: 400; color: var(--ink-deep); text-wrap: balance; }
+.sec-side { flex: none; display: flex; align-items: center; gap: 16px; }
+.sec-count { font-size: 14px; color: var(--mute); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.tile { position: relative; display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 8px; border-radius: 20px; }
+.tile[data-on="true"] { box-shadow: 0 0 0 2px var(--ok), var(--glass-shadow); }
+.pic {
+  position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; padding: 0; border: 0;
+  border-radius: 13px; overflow: hidden; background: rgba(255, 255, 255, 0.3); cursor: zoom-in;
+}
+div.pic { cursor: default; }
+.pic img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
+.num {
+  position: absolute; top: 8px; left: 8px; padding: 3px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.8);
+  font-size: 12px; letter-spacing: 0.06em; color: var(--ink-deep); font-variant-numeric: tabular-nums;
+}
+.tick {
+  position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 999px; background: var(--ok);
+  color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(46, 106, 75, 0.35);
+}
+.tick svg { width: 13px; height: 13px; }
+.approve {
+  height: 44px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;
+  border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.8); background: rgba(255, 255, 255, 0.5);
+  color: var(--ink-deep); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
+}
+.approve[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); color: #fff; }
+.approve svg { width: 14px; height: 14px; }
+
+@media (min-width: 720px) {
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .tile { gap: 10px; padding: 10px; border-radius: 22px; }
+  .pic { border-radius: 14px; }
+  .num { top: 10px; left: 10px; padding: 4px 10px; font-size: 13px; }
+  .tick { top: 10px; right: 10px; width: 28px; height: 28px; }
+  .tick svg { width: 14px; height: 14px; }
+  .approve { height: 46px; gap: 8px; font-size: 13px; letter-spacing: 0.16em; }
+}
+@media (min-width: 1040px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; } }
+@media (max-width: 719px) {
+  .wrap { padding: 14px 14px 120px; }
+  .head { flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px; border-radius: 24px; }
+  .head-main { gap: 6px; }
+  .head-main .logo { height: 26px; margin-bottom: 8px; }
+  .title { font-size: 28px; }
+  .lede { font-size: 14px; }
+  .chip { font-size: 11px; padding: 6px 12px; }
+  .section { margin-top: 28px; }
+  .sec-head { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px 16px 16px 18px; margin-bottom: 12px; }
+  .sec-name { font-size: 21px; }
+  .sec-side { justify-content: space-between; }
+  .card { padding: 28px 24px; border-radius: 26px; }
+  .card .logo { height: 30px; }
+  .card .title { margin-top: 24px; }
+  .card .lede { font-size: 15px; }
+  .card .ghost { align-self: stretch; }
+}
+
+/* bottom bar */
+.bar {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 20;
+  width: min(1180px, calc(100% - 28px)); transform: translateX(-50%);
+  padding: 12px 12px 12px 28px; border-radius: 24px;
+  background: rgba(255, 255, 255, 0.86); border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 16px 40px rgba(43, 37, 35, 0.18);
+}
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .bar { background: rgba(255, 255, 255, 0.72); -webkit-backdrop-filter: blur(26px) saturate(160%); backdrop-filter: blur(26px) saturate(160%); }
+}
+.bar-in { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.count { margin: 0; min-width: 0; font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.count strong { font-size: 28px; font-weight: 400; line-height: 1; color: var(--ink-deep); }
+.count small { display: block; margin-top: 3px; font-size: 12.5px; color: var(--mute); }
+.submit { flex: none; height: 52px; padding: 0 44px; font-size: 14px; }
+.bar .error { margin-top: 8px; font-size: 13.5px; }
+.bar .fallback { margin: 6px 0 0; font-size: 13px; color: var(--ink-deep); overflow-wrap: anywhere; user-select: all; }
+@media (max-width: 719px) {
+  .bar { bottom: calc(14px + env(safe-area-inset-bottom, 0px)); padding: 10px 10px 10px 20px; border-radius: 22px; }
+  .count { font-size: 13.5px; }
+  .count strong { font-size: 24px; }
+  .count small { font-size: 11.5px; }
+  .submit { height: 48px; padding: 0 24px; font-size: 13px; letter-spacing: 0.16em; }
+}
+
+/* image viewer */
+.viewer {
+  position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; color: #fff;
+  background: rgba(28, 24, 22, 0.9);
+}
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .viewer { background: rgba(28, 24, 22, 0.84); -webkit-backdrop-filter: blur(30px) saturate(120%); backdrop-filter: blur(30px) saturate(120%); }
+}
+.viewer-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(24px + env(safe-area-inset-top, 0px)) 32px 0; }
+.vchip {
+  padding: 9px 18px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 14px; letter-spacing: 0.1em; font-variant-numeric: tabular-nums;
+}
+.vbtn {
+  height: 56px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.10); border: 1px solid rgba(255, 255, 255, 0.18); color: #fff;
+  font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer;
+}
+.vbtn:disabled { opacity: 0.3; cursor: default; }
+.vclose { height: 42px; padding: 0 22px; font-size: 13px; }
+.vapprove[aria-pressed="false"] { background: #fff; border-color: #fff; color: var(--ink-deep); }
+.vapprove[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); box-shadow: 0 8px 24px rgba(46, 106, 75, 0.35); }
+.viewer-stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 20px 32px 16px; }
+.viewer-stage img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 18px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45); }
+.vproject { margin: 0 auto; padding: 0 16px 14px; max-width: 640px; text-align: center; font-size: 14px; letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.8); }
+.viewer-ctl {
+  display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; gap: 10px; width: min(560px, 100%);
+  margin: 0 auto; padding: 0 16px calc(32px + env(safe-area-inset-bottom, 0px));
+}
+@media (max-width: 719px) {
+  .viewer-top { padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 0; }
+  .vchip { padding: 8px 14px; font-size: 13px; }
+  .vclose { height: 40px; padding: 0 18px; font-size: 12px; }
+  .viewer-stage { padding: 16px; }
+  .viewer-stage img { border-radius: 14px; }
+  .vproject { font-size: 13px; padding-bottom: 12px; }
+  .viewer-ctl { grid-template-columns: 52px minmax(0, 1fr) 52px; padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+  .vbtn { height: 52px; font-size: 13px; }
+  .vclose { height: 40px; }
+}
+
+/* approved images (link in the email) */
+.res-head { align-items: flex-end; }
+.numbers {
+  align-self: stretch; margin: 8px 0 0; padding: 12px 16px; border-radius: 14px; background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.75); font-size: 14px; line-height: 1.6; color: var(--ink-deep);
+  font-variant-numeric: tabular-nums; user-select: all;
+}
+.numbers p { margin: 0; }
+.numbers b { font-weight: 400; color: var(--mute); }
+.actions { flex: none; width: 300px; display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+.actions .primary { height: 52px; font-size: 13px; letter-spacing: 0.12em; }
+.actions .ghost { height: 48px; font-size: 13px; letter-spacing: 0.14em; }
+.cap { padding: 0 6px 4px; min-width: 0; }
+.cap b { display: block; font-weight: 400; font-size: 17px; color: var(--ink-deep); font-variant-numeric: tabular-nums; }
+.cap span { display: block; margin-top: 2px; font-size: 11.5px; line-height: 1.35; color: var(--mute); overflow-wrap: anywhere; }
+@media (max-width: 719px) {
+  .actions { width: 100%; }
+  .cap b { font-size: 15px; }
+  .cap span { font-size: 10.5px; }
+}
+
+@media (hover: hover) {
+  .primary:hover, .submit:hover { background: var(--oxblood-deep); }
+  .approve:hover { background: rgba(255, 255, 255, 0.78); }
+  .approve[aria-pressed="true"]:hover { background: var(--ok-deep); }
+  .ghost:hover, .all:hover { background: rgba(255, 255, 255, 0.78); }
+  .vbtn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.18); }
+  .vapprove[aria-pressed="false"]:hover { background: #f1ede7; }
+  .vapprove[aria-pressed="true"]:hover { background: var(--ok-deep); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .approve, .primary, .submit, .ghost, .all, .vbtn { transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+const CFG = {"salt": "Iaj5uY4vwW/ZLFC7fWShWw==", "iter": 250000, "total": 300, "v": "9523ad18", "data": "../approval-data/d/", "use": "website"};
+const USES = {
+  website: { label: "Website", title: "Images for the website", on: "on the website", for: "for the website", slug: "website" },
+  profile: { label: "Company profile", title: "Images for the company profile", on: "in the company profile", for: "for the company profile", slug: "company-profile" },
+  hospitality: { label: "Hospitality presentation", title: "Images for the hospitality presentation", on: "in the hospitality presentation", for: "for the hospitality presentation", slug: "hospitality-presentation" },
+};
+const USE = USES[CFG.use] || USES.profile;
+const app = document.getElementById("app");
+const FONT = 'Optima, "Optima Nova", Candara, "Segoe UI", "Gill Sans", "Trebuchet MS", sans-serif';
+const CHECK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const LEFT = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const RIGHT = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+let KEY = null;          // AES key, derived from the passcode
+let MAN = null;          // decrypted manifest: { sections: [{id,name}], images: [{n,s,k,w,h,tw,th,name}], mail }
+let SEL = new Set();     // approved image numbers (n)
+let sending = false;
+let failures = 0;
+const thumbs = new Map(); // n -> Promise<{ bytes, url }>
+const fulls = new Map();  // n -> Promise<string>
+
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const kid of kids.flat()) {
+    if (kid == null || kid === false) continue;
+    el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  }
+  return el;
+}
+const pad2 = (k) => String(k).padStart(2, "0");
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch { /* convenience only */ } },
+};
+const SEL_KEY = "ak-sel:" + CFG.v + ":" + CFG.use;
+const PASS_KEY = "ak-pass:" + CFG.v;
+const logo = () => h("img", { class: "logo", src: "logo.svg", alt: "Adada & Kabbani", width: 93, height: 30 });
+const secOf = (img) => MAN.sections[img.s];
+const eyebrow = (sec) => sec.eyebrow || `Project ${sec.id}`;
+const PDF_NAME = `Adada-Kabbani-${USE.slug}-approved-images.pdf`;
+const today = () => new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+/* ---------- crypto ---------- */
+const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+async function deriveKey(pass) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass.trim().toLowerCase()), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: b64(CFG.salt), iterations: CFG.iter, hash: "SHA-256" },
+    base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+}
+async function fetchBytes(name) {
+  const r = await fetch((CFG.data || "d/") + name + ".bin?v=" + CFG.v);
+  if (!r.ok) throw new Error("network");
+  return new Uint8Array(await r.arrayBuffer());
+}
+async function decrypt(buf, key) {
+  return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: buf.subarray(0, 12) }, key, buf.subarray(12)));
+}
+const openFile = async (name) => decrypt(await fetchBytes(name), KEY);
+
+function thumb(n) {
+  if (!thumbs.has(n)) {
+    const p = openFile("t" + n).then((bytes) => ({ bytes, url: URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" })) }));
+    p.catch(() => thumbs.delete(n));
+    thumbs.set(n, p);
+  }
+  return thumbs.get(n);
+}
+function full(n) {
+  if (!fulls.has(n)) {
+    const p = openFile("f" + n).then((bytes) => URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" })));
+    p.catch(() => fulls.delete(n));
+    fulls.set(n, p);
+  }
+  return fulls.get(n);
+}
+
+/* ---------- gate ---------- */
+async function unlock(pass) {
+  const key = await deriveKey(pass);
+  const sealed = await fetchBytes("m");        // throws "network" if offline
+  let plain;
+  try { plain = await decrypt(sealed, key); } catch { throw new Error("wrong"); }
+  KEY = key;
+  MAN = JSON.parse(new TextDecoder().decode(plain));
+  MAN.sections.forEach((sec, i) => { sec.index = i; sec.items = []; });
+  MAN.images.forEach((img, i) => { img.i = i; MAN.sections[img.s].items.push(img); });
+  store.set(PASS_KEY, pass.trim().toLowerCase());
+}
+
+function card(...kids) {
+  return h("main", { class: "center" }, h("div", { class: "card glass" }, logo(), ...kids));
+}
+
+function showGate(message) {
+  const input = h("input", { id: "code", class: "input", autocomplete: "off", autocapitalize: "none", autocorrect: "off", spellcheck: "false", "aria-describedby": "code-error" });
+  const error = h("p", { id: "code-error", class: "error", role: "alert", hidden: !message }, message || "");
+  const button = h("button", { class: "primary", type: "submit" }, "Continue");
+  const form = h("form", { class: "gate", onsubmit: async (e) => {
+    e.preventDefault();
+    if (!input.value.trim() || button.disabled) return;
+    button.disabled = true; button.textContent = "Checking"; error.hidden = true;
+    try {
+      await unlock(input.value);
+      start();
+    } catch (err) {
+      error.textContent = err.message === "wrong" ? "That passcode is not correct." : "The page could not load. Check your connection and try again.";
+      error.hidden = false; button.disabled = false; button.textContent = "Continue";
+    }
+  } }, h("label", { class: "label", for: "code" }, "Passcode"), input, error, button);
+  app.replaceChildren(card(
+    h("h1", { class: "title" }, location.hash.startsWith("#r-") ? "Approved images" : USE.title),
+    h("p", { class: "lede" }, "Enter the passcode to view the images."), form));
+}
+
+/* ---------- selection ---------- */
+const approved = () => MAN.images.filter((i) => SEL.has(i.n));
+function saveSel() { store.set(SEL_KEY, JSON.stringify([...SEL])); }
+
+let barCount, barHint, barSubmit, barError, tiles = new Map(), secUI = [], viewerState = null;
+const SEND_MS = 20000;   // attachment request: base time limit, plus 10 s per MB of PDF
+const LINKS_MS = 12000;  // links-only request (8 s when the attachment request already timed out)
+const io = "IntersectionObserver" in window ? new IntersectionObserver((entries) => {
+  for (const entry of entries) {
+    if (!entry.isIntersecting) continue;
+    io.unobserve(entry.target);
+    loadThumb(entry.target);
+  }
+}, { rootMargin: "800px 0px" }) : null;
+function loadThumb(img) {
+  thumb(Number(img.dataset.n)).then((t) => { img.src = t.url; }).catch(() => { if (io) setTimeout(() => io.observe(img), 3000); });
+}
+
+function paintTile(n) {
+  const t = tiles.get(n);
+  if (!t) return;
+  const on = SEL.has(n);
+  const img = MAN.images[n - 1];
+  t.li.dataset.on = String(on);
+  t.tick.hidden = !on;
+  t.btn.setAttribute("aria-pressed", String(on));
+  t.btn.setAttribute("aria-label", on ? `Image ${pad2(img.k)}, ${secOf(img).name}, approved. Tap to undo.` : `Approve image ${pad2(img.k)}, ${secOf(img).name}`);
+  t.btn.innerHTML = on ? CHECK + "Approved" : "Approve";
+}
+function paintSection(si) {
+  const ui = secUI[si];
+  if (!ui) return;
+  const sec = MAN.sections[si];
+  const count = sec.items.filter((i) => SEL.has(i.n)).length;
+  const all = count === sec.items.length;
+  ui.count.textContent = `${count} of ${sec.items.length} approved`;
+  ui.all.textContent = all ? "Clear all" : "Approve all";
+  ui.all.setAttribute("aria-label", all ? `Clear all approvals in ${sec.name}` : `Approve all ${sec.items.length} images in ${sec.name}`);
+}
+function paintBar() {
+  const count = approved().length;
+  barCount.textContent = String(count);
+  barHint.textContent = sending ? "Sending to Omar. This can take up to a minute." : count ? "Press Submit when you are finished" : "Approve at least one image";
+  barSubmit.disabled = !count || sending;
+  barSubmit.textContent = sending ? "Sending" : "Submit";
+}
+function afterChange() {
+  saveSel(); paintBar();
+  barError.hidden = true;
+  if (viewerState) paintViewer();
+}
+function toggle(n) {
+  if (sending) return;
+  if (SEL.has(n)) SEL.delete(n); else SEL.add(n);
+  paintTile(n); paintSection(MAN.images[n - 1].s);
+  afterChange();
+}
+function toggleSection(si) {
+  if (sending) return;
+  const items = MAN.sections[si].items;
+  const all = items.every((i) => SEL.has(i.n));
+  for (const i of items) { if (all) SEL.delete(i.n); else SEL.add(i.n); paintTile(i.n); }
+  paintSection(si);
+  afterChange();
+}
+
+function sectionHead(sec, side) {
+  return h("div", { class: "sec-head glass" },
+    h("div", { class: "sec-titles" },
+      h("p", { class: "eyebrow" }, eyebrow(sec)),
+      h("h2", { class: "sec-name", id: "h" + sec.id }, sec.name.replace(/ · /g, "\u00a0· "))),
+    h("div", { class: "sec-side" }, ...side));
+}
+
+function showSelection() {
+  tiles = new Map(); secUI = [];
+  const sections = MAN.sections.map((sec, si) => {
+    const count = h("span", { class: "sec-count" });
+    const all = h("button", { type: "button", class: "all", onclick: () => toggleSection(si) });
+    secUI[si] = { count, all };
+    const grid = h("ul", { class: "grid" });
+    for (const img of sec.items) {
+      const pic = h("img", { alt: `Image ${pad2(img.k)}, ${sec.name}`, width: img.tw, height: img.th, "data-n": img.n, decoding: "async" });
+      const tick = h("span", { class: "tick", html: CHECK, hidden: true });
+      const btn = h("button", { type: "button", class: "approve", id: "approve-" + img.n, onclick: () => toggle(img.n) });
+      const li = h("li", { class: "tile glass" },
+        h("button", { type: "button", class: "pic", "aria-label": `View image ${pad2(img.k)}, ${sec.name}, larger`, onclick: (e) => openViewer(img.i, e.currentTarget) },
+          pic, h("span", { class: "num" }, pad2(img.k)), tick),
+        btn);
+      tiles.set(img.n, { li, tick, btn });
+      grid.append(li);
+      if (io) io.observe(pic); else loadThumb(pic);
+    }
+    return h("section", { class: "section", id: "p" + sec.id, "aria-labelledby": "h" + sec.id }, sectionHead(sec, [count, all]), grid);
+  });
+
+  barCount = h("strong", {});
+  barHint = h("small", {});
+  barSubmit = h("button", { type: "button", id: "submit", class: "submit", onclick: submit });
+  barError = h("p", { class: "error", role: "alert", hidden: true });
+  const bar = h("div", { class: "bar" },
+    h("div", { class: "bar-in" },
+      h("p", { class: "count", "aria-live": "polite" }, barCount, ` of ${CFG.total} approved`, barHint),
+      barSubmit),
+    barError);
+
+  app.replaceChildren(
+    h("main", { class: "wrap" },
+      h("header", { class: "head glass" },
+        h("div", { class: "head-main" },
+          logo(),
+          h("h1", { class: "title" }, USE.title),
+          h("p", { class: "lede" }, `The project images, grouped by project. Approve the ones to use ${USE.on}. Tap Approve under each image you want, or Approve all to take a whole section. Tap an image to see it larger. When you are finished, press Submit at the bottom.`)),
+        h("span", { class: "chip" }, `${CFG.total} images · ${MAN.sections.length} sections`)),
+      ...sections),
+    bar);
+  MAN.images.forEach((img) => paintTile(img.n));
+  MAN.sections.forEach((_, si) => paintSection(si));
+  paintBar();
+}
+
+/* ---------- viewer ---------- */
+function openViewer(index, opener) {
+  const img = h("img", { alt: "" });
+  const counter = h("span", { class: "vchip" });
+  const project = h("p", { class: "vproject" });
+  const prev = h("button", { type: "button", class: "vbtn", "aria-label": "Previous image", html: LEFT, onclick: () => moveViewer(-1) });
+  const next = h("button", { type: "button", class: "vbtn", "aria-label": "Next image", html: RIGHT, onclick: () => moveViewer(1) });
+  const approveBtn = h("button", { type: "button", class: "vbtn vapprove", id: "viewer-approve", onclick: () => toggle(MAN.images[viewerState.index].n) });
+  const close = h("button", { type: "button", class: "vbtn vclose", id: "viewer-close", onclick: closeViewer }, "Close");
+  let touchX = null;
+  const stage = h("div", { class: "viewer-stage",
+    ontouchstart: (e) => { touchX = e.touches[0] ? e.touches[0].clientX : null; },
+    ontouchend: (e) => {
+      if (touchX === null) return;
+      const dx = (e.changedTouches[0] ? e.changedTouches[0].clientX : touchX) - touchX;
+      touchX = null;
+      if (Math.abs(dx) > 48) moveViewer(dx < 0 ? 1 : -1);
+    } }, img);
+  const el = h("div", { class: "viewer", role: "dialog", "aria-modal": "true" },
+    h("div", { class: "viewer-top" }, counter, close),
+    stage, project,
+    h("div", { class: "viewer-ctl" }, prev, approveBtn, next));
+  viewerState = { index, el, img, counter, project, prev, next, approveBtn, opener, overflow: document.body.style.overflow };
+  document.body.style.overflow = "hidden";
+  document.body.append(el);
+  paintViewer(true);
+  close.focus({ preventScroll: true });
+}
+function paintViewer(imageChanged) {
+  const v = viewerState;
+  const item = MAN.images[v.index];
+  const sec = secOf(item);
+  const on = SEL.has(item.n);
+  v.counter.textContent = `${pad2(item.k)} / ${pad2(sec.items.length)}`;
+  v.project.textContent = `${eyebrow(sec)} · ${sec.name}`;
+  v.el.setAttribute("aria-label", `Image ${pad2(item.k)}, ${sec.name}`);
+  v.prev.disabled = v.index === 0;
+  v.next.disabled = v.index === MAN.images.length - 1;
+  v.approveBtn.setAttribute("aria-pressed", String(on));
+  v.approveBtn.innerHTML = on ? CHECK + "Approved" : "Approve";
+  if (!imageChanged) return;
+  const shown = v.index;
+  v.img.alt = `Image ${pad2(item.k)}, ${sec.name}`;
+  delete v.img.dataset.full;
+  v.img.removeAttribute("src");
+  thumb(item.n).then((t) => { if (viewerState && viewerState.index === shown && !v.img.dataset.full) v.img.src = t.url; }).catch(() => {});
+  full(item.n).then((url) => { if (viewerState && viewerState.index === shown) { v.img.src = url; v.img.dataset.full = "1"; } }).catch(() => {});
+}
+function moveViewer(step) {
+  const next = viewerState.index + step;
+  if (next < 0 || next >= MAN.images.length) return;
+  viewerState.index = next;
+  paintViewer(true);
+}
+function closeViewer() {
+  if (!viewerState) return;
+  const { el, overflow, opener, index } = viewerState;
+  document.body.style.overflow = overflow;
+  el.remove();
+  viewerState = null;
+  const t = tiles.get(MAN.images[index].n);
+  const target = t && t.li.isConnected ? t.li.querySelector(".pic") : opener;
+  if (target && target.isConnected) {
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({ block: "nearest" });
+  }
+}
+window.addEventListener("keydown", (e) => {
+  if (!viewerState) return;
+  if (e.key === "Escape") closeViewer();
+  if (e.key === "ArrowRight") moveViewer(1);
+  if (e.key === "ArrowLeft") moveViewer(-1);
+});
+
+/* ---------- numbers ---------- */
+function groups(picked) {
+  return MAN.sections.map((sec) => ({ sec, items: picked.filter((i) => i.s === sec.index) }));
+}
+function numberLines(picked) {
+  return groups(picked).filter((g) => g.items.length)
+    .map((g) => ({ title: `${g.sec.id} ${g.sec.name}`, nums: g.items.map((i) => pad2(i.k)).join(", ") }));
+}
+const asciiLabel = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s*·\s*/g, " - ").replace(/[^\x20-\x7e]/g, "");
+function encodeSel(picked) {
+  const bytes = new Uint8Array(Math.ceil(CFG.total / 8));
+  for (const i of picked) { const b = i.n - 1; bytes[b >> 3] |= 1 << (b & 7); }
+  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function decodeSel(code) {
+  let s = code.replace(/-/g, "+").replace(/_/g, "/");
+  while (s.length % 4) s += "=";
+  const bin = atob(s), out = [];
+  for (let b = 0; b < bin.length * 8 && b < CFG.total; b += 1) if (bin.charCodeAt(b >> 3) & (1 << (b & 7))) out.push(b + 1);
+  return out;
+}
+
+/* ---------- contact sheet PDF: A4 portrait, 4 x 4 glass tiles, one project per page run ---------- */
+const SHEET = { W: 794, H: 1123, X: 40, HEAD_Y: 36, HEAD_H: 128, GRID_Y: 178, COLS: 4, ROWS: 4, GAP: 12, TILE_W: 169.5, TILE_H: 218.2 };
+function loadImage(src) {
+  return new Promise((resolve, reject) => { const im = new Image(); im.onload = () => resolve(im); im.onerror = () => reject(new Error("image")); im.src = src; });
+}
+function rrSub(ctx, x, y, w, hh, r) {
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + hh, r);
+  ctx.arcTo(x + w, y + hh, x, y + hh, r);
+  ctx.arcTo(x, y + hh, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function rr(ctx, x, y, w, hh, r) { ctx.beginPath(); rrSub(ctx, x, y, w, hh, r); }
+function glassPanel(ctx, scale, x, y, w, hh, r, blur, offY, alpha) {
+  ctx.save();
+  ctx.beginPath(); ctx.rect(-100, -100, SHEET.W + 200, SHEET.H + 200); rrSub(ctx, x, y, w, hh, r); ctx.clip("evenodd");
+  ctx.shadowColor = `rgba(43,37,35,${alpha})`; ctx.shadowBlur = blur * scale; ctx.shadowOffsetY = offY * scale;
+  ctx.fillStyle = "#000"; rr(ctx, x, y, w, hh, r); ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = "rgba(255,255,255,0.42)"; rr(ctx, x, y, w, hh, r); ctx.fill();
+  ctx.save(); rr(ctx, x, y, w, hh, r); ctx.clip();
+  ctx.fillStyle = "rgba(255,255,255,0.75)"; ctx.fillRect(x, y + 1, w, 1);
+  ctx.restore();
+  ctx.strokeStyle = "rgba(255,255,255,0.7)"; ctx.lineWidth = 1; rr(ctx, x + 0.5, y + 0.5, w - 1, hh - 1, r - 0.5); ctx.stroke();
+}
+function tracked(ctx, text, x, y, spacing, alignRight) {
+  const widths = [...text].map((ch) => ctx.measureText(ch).width);
+  const total = widths.reduce((a, b) => a + b, 0) + spacing * Math.max(0, widths.length - 1);
+  let cx = alignRight ? x - total : x;
+  [...text].forEach((ch, i) => { ctx.fillText(ch, cx, y); cx += widths[i] + spacing; });
+  return total;
+}
+function trackedWidth(ctx, text, spacing) {
+  return [...text].reduce((a, ch) => a + ctx.measureText(ch).width, 0) + spacing * Math.max(0, [...text].length - 1);
+}
+function fit(ctx, text, maxW) {
+  if (ctx.measureText(text).width <= maxW) return text;
+  let t = text;
+  while (t.length > 1 && ctx.measureText(t + "…").width > maxW) t = t.slice(0, -1);
+  return t.trimEnd() + "…";
+}
+function wrapLines(ctx, text, maxW, maxLines) {
+  const words = text.split(" ");
+  const lines = [];
+  let line = "";
+  for (const w of words) {
+    const t = line ? line + " " + w : w;
+    if (!line || ctx.measureText(t).width <= maxW) line = t;
+    else { lines.push(line); line = w; }
+  }
+  if (line) lines.push(line);
+  if (lines.length > maxLines) {
+    const keep = lines.slice(0, maxLines);
+    keep[maxLines - 1] = fit(ctx, keep[maxLines - 1] + " " + lines.slice(maxLines).join(" "), maxW);
+    if (!keep[maxLines - 1].endsWith("…")) keep[maxLines - 1] += "…";
+    return keep;
+  }
+  return lines.map((l) => fit(ctx, l, maxW));
+}
+function drawPage(ctx, scale, page, pageNo, pageCount, assets, pics, totals) {
+  const S = SHEET;
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  ctx.fillStyle = "#e6ded3"; ctx.fillRect(0, 0, S.W, S.H);
+  const bg = assets.bg;
+  const k = Math.max(S.W / bg.naturalWidth, S.H / bg.naturalHeight);
+  ctx.drawImage(bg, (S.W - bg.naturalWidth * k) / 2, (S.H - bg.naturalHeight * k) / 2, bg.naturalWidth * k, bg.naturalHeight * k);
+
+  // header panel
+  const hx = S.X, hy = S.HEAD_Y, hw = S.W - 2 * S.X, hh = S.HEAD_H;
+  glassPanel(ctx, scale, hx, hy, hw, hh, 22, 30, 10, 0.10);
+  const ix = hx + 25, iy = hy + 21;
+  const lh = 22, lw = lh * (assets.logo.naturalWidth / assets.logo.naturalHeight);
+  ctx.drawImage(assets.logo, ix, iy, lw, lh);
+  ctx.textBaseline = "alphabetic";
+  // page chip (right, aligned with the last text line)
+  ctx.font = `10px ${FONT}`;
+  const chipText = `PAGE ${pageNo} OF ${pageCount}`;
+  const chipW = trackedWidth(ctx, chipText, 1.6) + 26, chipH = 26.5;
+  const chipX = hx + hw - 25 - chipW, chipY = hy + hh - 21 - chipH;
+  ctx.fillStyle = "rgba(255,255,255,0.55)"; rr(ctx, chipX, chipY, chipW, chipH, chipH / 2); ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.8)"; ctx.lineWidth = 1; rr(ctx, chipX + 0.5, chipY + 0.5, chipW - 1, chipH - 1, chipH / 2 - 0.5); ctx.stroke();
+  ctx.fillStyle = "#49413e"; tracked(ctx, chipText, chipX + 13, chipY + 17, 1.6, false);
+  // title: the project name
+  const maxTitle = chipX - 24 - ix;
+  let size = 24;
+  ctx.font = `${size}px ${FONT}`;
+  while (size > 17 && ctx.measureText(page.sec.name).width > maxTitle) { size -= 1; ctx.font = `${size}px ${FONT}`; }
+  ctx.fillStyle = "#2b2523"; ctx.fillText(fit(ctx, page.sec.name, maxTitle), ix, iy + lh + 14 + 19.6);
+  ctx.font = `12px ${FONT}`; ctx.fillStyle = "#6a6461";
+  const part = page.parts > 1 ? ` · part ${page.part} of ${page.parts}` : "";
+  ctx.fillText(fit(ctx, `${USE.label} · ${eyebrow(page.sec)}${part} · ${page.count} of ${page.sec.items.length} approved · ${totals.date}`, maxTitle), ix, iy + lh + 14 + 26.4 + 6 + 12.3);
+
+  // tiles
+  page.items.forEach((img, i) => {
+    const x = S.X + (i % S.COLS) * (S.TILE_W + S.GAP);
+    const y = S.GRID_Y + Math.floor(i / S.COLS) * (S.TILE_H + S.GAP);
+    glassPanel(ctx, scale, x, y, S.TILE_W, S.TILE_H, 16, 22, 8, 0.09);
+    const wx = x + 9, wy = y + 9, ww = S.TILE_W - 18;
+    ctx.fillStyle = "rgba(255,255,255,0.3)"; rr(ctx, wx, wy, ww, ww, 10); ctx.fill();
+    const pic = pics.get(img.n);
+    if (pic) {
+      const f = Math.min(ww / pic.naturalWidth, ww / pic.naturalHeight);
+      const dw = pic.naturalWidth * f, dh = pic.naturalHeight * f;
+      ctx.save(); rr(ctx, wx, wy, ww, ww, 10); ctx.clip();
+      ctx.drawImage(pic, wx + (ww - dw) / 2, wy + (ww - dh) / 2, dw, dh);
+      ctx.restore();
+    }
+    const tx = x + 13, tw = ww - 8, capY = wy + ww + 7;
+    ctx.font = `13px ${FONT}`; ctx.fillStyle = "#2b2523";
+    ctx.fillText(pad2(img.k), tx, capY + 11.7);
+    ctx.font = `8.5px ${FONT}`; ctx.fillStyle = "#6a6461";
+    wrapLines(ctx, img.name, tw, 2).forEach((line, li) => ctx.fillText(line, tx, capY + 15.6 + 2 + 8.1 + li * 11.05));
+  });
+}
+function canvasJpeg(canvas, quality) {
+  return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? b.arrayBuffer().then((ab) => resolve(new Uint8Array(ab)), reject) : reject(new Error("encode"))), "image/jpeg", quality));
+}
+function pdfFromJpegs(jpegs, pxW, pxH) {
+  const PW = 595.28, PH = 841.89;
+  const enc = new TextEncoder();
+  const parts = [], offsets = [];
+  let size = 0;
+  const push = (d) => { const bytes = typeof d === "string" ? enc.encode(d) : d; parts.push(bytes); size += bytes.length; };
+  const object = (id, dict, stream) => {
+    offsets[id] = size;
+    push(`${id} 0 obj\n${dict}\n`);
+    if (stream) { push("stream\n"); push(stream); push("\nendstream\n"); }
+    push("endobj\n");
+  };
+  const n = jpegs.length;
+  const imgId = (p) => 3 + p * 3, contentId = (p) => 4 + p * 3, pageId = (p) => 5 + p * 3;
+  push("%PDF-1.4\n");
+  push(new Uint8Array([0x25, 0xe2, 0xe3, 0xcf, 0xd3, 0x0a]));
+  object(1, "<< /Type /Catalog /Pages 2 0 R >>");
+  object(2, `<< /Type /Pages /Count ${n} /Kids [${jpegs.map((_, p) => `${pageId(p)} 0 R`).join(" ")}] >>`);
+  jpegs.forEach((jpeg, p) => {
+    object(imgId(p), `<< /Type /XObject /Subtype /Image /Width ${pxW} /Height ${pxH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>`, jpeg);
+    const stream = enc.encode(`q ${PW} 0 0 ${PH} 0 0 cm /Im0 Do Q\n`);
+    object(contentId(p), `<< /Length ${stream.length} >>`, stream);
+    object(pageId(p), `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Contents ${contentId(p)} 0 R /Resources << /XObject << /Im0 ${imgId(p)} 0 R >> >> >>`);
+  });
+  const count = 2 + n * 3;
+  const xref = size;
+  let table = `xref\n0 ${count + 1}\n0000000000 65535 f \n`;
+  for (let id = 1; id <= count; id += 1) table += `${String(offsets[id]).padStart(10, "0")} 00000 n \n`;
+  push(table);
+  push(`trailer\n<< /Size ${count + 1} /Root 1 0 R /Info << /Title (Adada & Kabbani approved project images) >> >>\nstartxref\n${xref}\n%%EOF\n`);
+  return new Blob(parts, { type: "application/pdf" });
+}
+async function makeSheet(picked, opts) {
+  const scale = (opts && opts.scale) || 1.6, quality = (opts && opts.quality) || 0.84;
+  const pages = [];
+  for (const g of groups(picked)) {
+    if (!g.items.length) continue;
+    const parts = Math.ceil(g.items.length / 16);
+    for (let p = 0; p < parts; p += 1) pages.push({ sec: g.sec, items: g.items.slice(p * 16, p * 16 + 16), part: p + 1, parts, count: g.items.length });
+  }
+  const [bg, logoPng] = await Promise.all([loadImage("bg-port.jpg"), loadImage("logo.png")]);
+  const assets = { bg, logo: logoPng };
+  const totals = { count: picked.length, date: today() };
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(SHEET.W * scale); canvas.height = Math.round(SHEET.H * scale);
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingQuality = "high";
+  const jpegs = [];
+  for (let p = 0; p < pages.length; p += 1) {
+    const pics = new Map();
+    await Promise.all(pages[p].items.map(async (img) => {
+      try { const t = await thumb(img.n); pics.set(img.n, await loadImage(t.url)); } catch { /* tile drawn without its picture */ }
+    }));
+    drawPage(ctx, scale, pages[p], p + 1, pages.length, assets, pics, totals);
+    jpegs.push(await canvasJpeg(canvas, quality));
+  }
+  return pdfFromJpegs(jpegs, canvas.width, canvas.height);
+}
+async function makeSheetForEmail(picked) {
+  let pdf = await makeSheet(picked);
+  if (pdf.size > 9.2e6) pdf = await makeSheet(picked, { scale: 1.25, quality: 0.78 });
+  return pdf.size > 9.2e6 ? null : pdf;
+}
+
+/* ---------- submit ---------- */
+async function sendEmail(picked, pdf) {
+  const base = location.origin + location.pathname;
+  const fields = {
+    _subject: `Adada & Kabbani · ${USE.label} images: ${picked.length} of ${CFG.total} approved`,
+    _template: "table",
+    _captcha: "false",
+    "Approved for": USE.label,
+    "Approved": `${picked.length} of ${CFG.total}`,
+  };
+  for (const g of groups(picked)) {
+    fields[asciiLabel(`${g.sec.id} ${g.sec.name}`)] = g.items.length
+      ? `${g.items.map((i) => pad2(i.k)).join(", ")} (${g.items.length} of ${g.sec.items.length})`
+      : `None (0 of ${g.sec.items.length})`;
+  }
+  fields["Contact sheet"] = `${base}#r-${encodeSel(picked)}`;
+  fields["Submitted"] = new Date().toLocaleString("en-GB", { timeZone: "Asia/Riyadh" }) + " (Riyadh time)";
+  const read = async (response) => {
+    const data = await response.json().catch(() => null);
+    return { ok: response.ok && !!data && String(data.success) === "true", message: String((data && data.message) || response.status) };
+  };
+  // The relay sometimes stops answering; never wait on it for ever.
+  const post = async (body, headers, ms) => {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), ms);
+    try { return await read(await fetch(MAN.mail, { method: "POST", headers, body, signal: ctl.signal })); }
+    catch (e) { return { ok: false, message: e && e.name === "AbortError" ? "timeout" : String((e && e.message) || e) }; }
+    finally { clearTimeout(timer); }
+  };
+  let first = null;
+  if (pdf) {
+    const form = new FormData();
+    for (const [k, v] of Object.entries(fields)) form.append(k, v);
+    form.append("attachment", new File([pdf], PDF_NAME, { type: "application/pdf" }));
+    first = await post(form, { Accept: "application/json" }, SEND_MS + Math.round((pdf.size / 1e6) * 10000));
+    if (first.ok) return { ok: true, how: "attachment" };
+  }
+  const second = await post(JSON.stringify(fields), { "Content-Type": "application/json", Accept: "application/json" }, first && first.message === "timeout" ? 8000 : LINKS_MS);
+  return { ok: second.ok, how: "links", message: second.message, first: first && first.message };
+}
+
+async function submit() {
+  const picked = approved();
+  if (!picked.length || sending) return;
+  sending = true; paintBar();
+  barError.hidden = true;
+  let result;
+  try {
+    let pdf = null;
+    try { pdf = await makeSheetForEmail(picked); } catch { pdf = null; }
+    result = await sendEmail(picked, pdf);
+  } catch (e) {
+    result = { ok: false, message: String((e && e.message) || e) };
+  }
+  window.__lastSend = result;
+  sending = false;
+  closeViewer();
+  if (result.ok) { failures = 0; showDone(picked.length); return; }
+  failures += 1;
+  showNotSent(picked, result);
+}
+
+/* sending failed: try again, or hand the selection to the mail app */
+function selectionText(picked) {
+  return [`Approved ${USE.for}: ${picked.length} of ${CFG.total} images`, "",
+    ...numberLines(picked).map((l) => `${l.title}: ${l.nums}`), "",
+    `Contact sheet: ${location.origin + location.pathname}#r-${encodeSel(picked)}`].join("\n");
+}
+function mailAddress() {
+  try { const a = decodeURIComponent(String(MAN.mail).split("/").pop()); return /^[^@\s/]+@[^@\s/]+\.[^@\s/]+$/.test(a) ? a : null; } catch { return null; }
+}
+function showNotSent(picked, result) {
+  const text = selectionText(picked);
+  const to = mailAddress();
+  const subject = `Adada & Kabbani · ${USE.label} images: ${picked.length} of ${CFG.total} approved`;
+  const mail = to ? h("a", { class: "ghost", id: "mail-selection",
+    href: `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text.replace(/\n/g, "\r\n"))}` }, "Email the selection") : null;
+  const detail = result && result.message && !/^(timeout|Failed to fetch|Load failed|NetworkError.*)$/i.test(result.message) && result.message.length < 240 ? result.message : null;
+  app.replaceChildren(card(
+    h("h1", { class: "title" }, "Not sent yet"),
+    h("p", { class: "lede" }, to
+      ? "The email service did not respond. Press Try again, or send your selection to Omar from your mail app."
+      : "The email service did not respond. Press Try again in a minute."),
+    h("p", { class: "numbers sheet-text" }, text),
+    h("div", { class: "stack" },
+      h("button", { class: "primary", type: "button", id: "retry", onclick: () => { showSelection(); submit(); } }, "Try again"),
+      mail,
+      h("button", { class: "ghost", type: "button", onclick: showSelection }, "Back to the images")),
+    to ? h("p", { class: "note small" }, "If you use Email the selection, you are done once your mail app has sent it.") : null,
+    detail ? h("p", { class: "note small" }, "Service reply: " + detail) : null));
+  window.scrollTo(0, 0);
+}
+
+function showDone(count) {
+  app.replaceChildren(card(
+    h("div", { class: "done-mark", html: CHECK.replace(/width="16" height="16"/, 'width="30" height="30"').replace('stroke-width="2.8"', 'stroke-width="2.4"') }),
+    h("h1", { class: "title" }, "Sent. Thank you."),
+    h("p", { class: "lede" }, `${count} of ${CFG.total} images approved ${USE.for} and sent to Omar.`),
+    h("button", { class: "ghost", type: "button", onclick: showSelection }, "Change the selection")));
+  window.scrollTo(0, 0);
+}
+
+/* ---------- approved images (link in the email) ---------- */
+function showResult(numbers) {
+  const wanted = new Set(numbers);
+  const picked = MAN.images.filter((i) => wanted.has(i.n));
+  const lines = numberLines(picked);
+  const error = h("p", { class: "error", role: "alert", hidden: true });
+  const download = h("button", { class: "primary", id: "download", type: "button", onclick: async () => {
+    if (download.disabled) return;
+    download.disabled = true; download.textContent = "Building"; error.hidden = true;
+    try {
+      const url = URL.createObjectURL(await makeSheet(picked));
+      const link = h("a", { href: url, download: PDF_NAME });
+      document.body.append(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch {
+      error.textContent = "The contact sheet could not be built. Check your connection and try again."; error.hidden = false;
+    }
+    download.disabled = false; download.textContent = "Download contact sheet PDF";
+  } }, "Download contact sheet PDF");
+  const copy = h("button", { class: "ghost", type: "button", onclick: () => {
+    navigator.clipboard.writeText(lines.map((l) => `${l.title}: ${l.nums}`).join("\n")).then(() => { copy.textContent = "Copied"; }).catch(() => {});
+  } }, "Copy the numbers");
+  const sections = groups(picked).filter((g) => g.items.length).map((g) => {
+    const grid = h("ul", { class: "grid" });
+    for (const img of g.items) {
+      const pic = h("img", { alt: `Image ${pad2(img.k)}, ${g.sec.name}`, width: img.tw, height: img.th, "data-n": img.n });
+      grid.append(h("li", { class: "tile glass" }, h("div", { class: "pic" }, pic),
+        h("div", { class: "cap" }, h("b", {}, pad2(img.k)), h("span", {}, img.name))));
+      if (io) io.observe(pic); else loadThumb(pic);
+    }
+    return h("section", { class: "section", "aria-labelledby": "h" + g.sec.id },
+      sectionHead(g.sec, [h("span", { class: "sec-count" }, `${g.items.length} of ${g.sec.items.length} approved`)]), grid);
+  });
+  app.replaceChildren(h("main", { class: "wrap", style: "padding-bottom:64px" },
+    h("header", { class: "head res-head glass" },
+      h("div", { class: "head-main" },
+        logo(),
+        h("h1", { class: "title" }, "Approved images"),
+        h("p", { class: "lede" }, `${picked.length} of ${CFG.total} approved ${USE.for}.`),
+        lines.length ? h("div", { class: "numbers" }, ...lines.map((l) => h("p", {}, h("b", {}, l.title + ": "), l.nums))) : null,
+        error),
+      h("div", { class: "actions" }, download, copy)),
+    ...sections));
+  window.scrollTo(0, 0);
+}
+
+/* ---------- boot ---------- */
+function start() {
+  const m = location.hash.match(/^#r-([A-Za-z0-9_-]+)$/);
+  if (m) {
+    let nums = [];
+    try { nums = decodeSel(m[1]); } catch { nums = []; }
+    showResult(nums);
+    return;
+  }
+  try {
+    const saved = JSON.parse(store.get(SEL_KEY) || "[]");
+    const valid = new Set(MAN.images.map((i) => i.n));
+    SEL = new Set(Array.isArray(saved) ? saved.filter((n) => valid.has(n)) : []);
+  } catch { SEL = new Set(); }
+  showSelection();
+}
+window.addEventListener("hashchange", () => { if (KEY) { closeViewer(); start(); } });
+(async () => {
+  if (!window.crypto || !crypto.subtle) {
+    app.replaceChildren(card(h("h1", { class: "title" }, USE.title), h("p", { class: "lede" }, "This browser cannot open the page. Please open the link in Safari or Chrome.")));
+    return;
+  }
+  const remembered = store.get(PASS_KEY);
+  if (remembered) {
+    app.replaceChildren(card(h("p", { class: "note", style: "margin-top:24px" }, "Loading")));
+    try { await unlock(remembered); start(); return; } catch { /* fall through to the gate */ }
+  }
+  showGate();
+})();
+</script>
+</body>
+</html>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#E6DED3">
-<title>Adada &amp; Kabbani · Project images</title>
+<title>Adada &amp; Kabbani · Images for the company profile</title>
 <style>
 /* Adada & Kabbani project image approval. Frosted-glass panels over a blurred
    atrium photograph; one section per project; a floating glass bar with Submit. */
@@ -271,7 +271,13 @@ div.pic { cursor: default; }
 <div id="app"></div>
 <script>
 "use strict";
-const CFG = {"salt": "Iaj5uY4vwW/ZLFC7fWShWw==", "iter": 250000, "total": 241, "v": "6cebf70a"};
+const CFG = {"salt": "Iaj5uY4vwW/ZLFC7fWShWw==", "iter": 250000, "total": 300, "v": "9523ad18", "data": "../approval-data/d/", "use": "profile"};
+const USES = {
+  website: { label: "Website", title: "Images for the website", on: "on the website", for: "for the website", slug: "website" },
+  profile: { label: "Company profile", title: "Images for the company profile", on: "in the company profile", for: "for the company profile", slug: "company-profile" },
+  hospitality: { label: "Hospitality presentation", title: "Images for the hospitality presentation", on: "in the hospitality presentation", for: "for the hospitality presentation", slug: "hospitality-presentation" },
+};
+const USE = USES[CFG.use] || USES.profile;
 const app = document.getElementById("app");
 const FONT = 'Optima, "Optima Nova", Candara, "Segoe UI", "Gill Sans", "Trebuchet MS", sans-serif';
 const CHECK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -306,10 +312,12 @@ const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch { /* convenience only */ } },
 };
-const SEL_KEY = "ak-sel:" + CFG.v;
+const SEL_KEY = "ak-sel:" + CFG.v + ":" + CFG.use;
 const PASS_KEY = "ak-pass:" + CFG.v;
 const logo = () => h("img", { class: "logo", src: "logo.svg", alt: "Adada & Kabbani", width: 93, height: 30 });
 const secOf = (img) => MAN.sections[img.s];
+const eyebrow = (sec) => sec.eyebrow || `Project ${sec.id}`;
+const PDF_NAME = `Adada-Kabbani-${USE.slug}-approved-images.pdf`;
 const today = () => new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
 /* ---------- crypto ---------- */
@@ -321,7 +329,7 @@ async function deriveKey(pass) {
     base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
 }
 async function fetchBytes(name) {
-  const r = await fetch("d/" + name + ".bin?v=" + CFG.v);
+  const r = await fetch((CFG.data || "d/") + name + ".bin?v=" + CFG.v);
   if (!r.ok) throw new Error("network");
   return new Uint8Array(await r.arrayBuffer());
 }
@@ -381,7 +389,7 @@ function showGate(message) {
     }
   } }, h("label", { class: "label", for: "code" }, "Passcode"), input, error, button);
   app.replaceChildren(card(
-    h("h1", { class: "title" }, location.hash.startsWith("#r-") ? "Approved images" : "Project images"),
+    h("h1", { class: "title" }, location.hash.startsWith("#r-") ? "Approved images" : USE.title),
     h("p", { class: "lede" }, "Enter the passcode to view the images."), form));
 }
 
@@ -454,7 +462,7 @@ function toggleSection(si) {
 function sectionHead(sec, side) {
   return h("div", { class: "sec-head glass" },
     h("div", { class: "sec-titles" },
-      h("p", { class: "eyebrow" }, `Project ${sec.id}`),
+      h("p", { class: "eyebrow" }, eyebrow(sec)),
       h("h2", { class: "sec-name", id: "h" + sec.id }, sec.name.replace(/ · /g, "\u00a0· "))),
     h("div", { class: "sec-side" }, ...side));
 }
@@ -496,9 +504,9 @@ function showSelection() {
       h("header", { class: "head glass" },
         h("div", { class: "head-main" },
           logo(),
-          h("h1", { class: "title" }, "Project images"),
-          h("p", { class: "lede" }, "The project images for the company profile, grouped by project. Tap Approve under each image you want to use, or Approve all to take a whole project. Tap an image to see it larger. When you are finished, press Submit at the bottom.")),
-        h("span", { class: "chip" }, `${CFG.total} images · ${MAN.sections.length} projects`)),
+          h("h1", { class: "title" }, USE.title),
+          h("p", { class: "lede" }, `The project images, grouped by project. Approve the ones to use ${USE.on}. Tap Approve under each image you want, or Approve all to take a whole section. Tap an image to see it larger. When you are finished, press Submit at the bottom.`)),
+        h("span", { class: "chip" }, `${CFG.total} images · ${MAN.sections.length} sections`)),
       ...sections),
     bar);
   MAN.images.forEach((img) => paintTile(img.n));
@@ -540,7 +548,7 @@ function paintViewer(imageChanged) {
   const sec = secOf(item);
   const on = SEL.has(item.n);
   v.counter.textContent = `${pad2(item.k)} / ${pad2(sec.items.length)}`;
-  v.project.textContent = `Project ${sec.id} · ${sec.name}`;
+  v.project.textContent = `${eyebrow(sec)} · ${sec.name}`;
   v.el.setAttribute("aria-label", `Image ${pad2(item.k)}, ${sec.name}`);
   v.prev.disabled = v.index === 0;
   v.next.disabled = v.index === MAN.images.length - 1;
@@ -693,7 +701,7 @@ function drawPage(ctx, scale, page, pageNo, pageCount, assets, pics, totals) {
   ctx.fillStyle = "#2b2523"; ctx.fillText(fit(ctx, page.sec.name, maxTitle), ix, iy + lh + 14 + 19.6);
   ctx.font = `12px ${FONT}`; ctx.fillStyle = "#6a6461";
   const part = page.parts > 1 ? ` · part ${page.part} of ${page.parts}` : "";
-  ctx.fillText(fit(ctx, `Project ${page.sec.id}${part} · ${page.count} of ${page.sec.items.length} approved · ${totals.count} of ${CFG.total} overall · ${totals.date}`, maxTitle), ix, iy + lh + 14 + 26.4 + 6 + 12.3);
+  ctx.fillText(fit(ctx, `${USE.label} · ${eyebrow(page.sec)}${part} · ${page.count} of ${page.sec.items.length} approved · ${totals.date}`, maxTitle), ix, iy + lh + 14 + 26.4 + 6 + 12.3);
 
   // tiles
   page.items.forEach((img, i) => {
@@ -788,9 +796,10 @@ async function makeSheetForEmail(picked) {
 async function sendEmail(picked, pdf) {
   const base = location.origin + location.pathname;
   const fields = {
-    _subject: `Adada & Kabbani project images: ${picked.length} of ${CFG.total} approved`,
+    _subject: `Adada & Kabbani · ${USE.label} images: ${picked.length} of ${CFG.total} approved`,
     _template: "table",
     _captcha: "false",
+    "Approved for": USE.label,
     "Approved": `${picked.length} of ${CFG.total}`,
   };
   for (const g of groups(picked)) {
@@ -816,7 +825,7 @@ async function sendEmail(picked, pdf) {
   if (pdf) {
     const form = new FormData();
     for (const [k, v] of Object.entries(fields)) form.append(k, v);
-    form.append("attachment", new File([pdf], "Adada-Kabbani-approved-project-images.pdf", { type: "application/pdf" }));
+    form.append("attachment", new File([pdf], PDF_NAME, { type: "application/pdf" }));
     first = await post(form, { Accept: "application/json" }, SEND_MS + Math.round((pdf.size / 1e6) * 10000));
     if (first.ok) return { ok: true, how: "attachment" };
   }
@@ -847,7 +856,7 @@ async function submit() {
 
 /* sending failed: try again, or hand the selection to the mail app */
 function selectionText(picked) {
-  return [`Approved project images: ${picked.length} of ${CFG.total}`, "",
+  return [`Approved ${USE.for}: ${picked.length} of ${CFG.total} images`, "",
     ...numberLines(picked).map((l) => `${l.title}: ${l.nums}`), "",
     `Contact sheet: ${location.origin + location.pathname}#r-${encodeSel(picked)}`].join("\n");
 }
@@ -857,7 +866,7 @@ function mailAddress() {
 function showNotSent(picked, result) {
   const text = selectionText(picked);
   const to = mailAddress();
-  const subject = `Adada & Kabbani project images: ${picked.length} of ${CFG.total} approved`;
+  const subject = `Adada & Kabbani · ${USE.label} images: ${picked.length} of ${CFG.total} approved`;
   const mail = to ? h("a", { class: "ghost", id: "mail-selection",
     href: `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text.replace(/\n/g, "\r\n"))}` }, "Email the selection") : null;
   const detail = result && result.message && !/^(timeout|Failed to fetch|Load failed|NetworkError.*)$/i.test(result.message) && result.message.length < 240 ? result.message : null;
@@ -880,7 +889,7 @@ function showDone(count) {
   app.replaceChildren(card(
     h("div", { class: "done-mark", html: CHECK.replace(/width="16" height="16"/, 'width="30" height="30"').replace('stroke-width="2.8"', 'stroke-width="2.4"') }),
     h("h1", { class: "title" }, "Sent. Thank you."),
-    h("p", { class: "lede" }, `${count} of ${CFG.total} images approved and sent to Omar.`),
+    h("p", { class: "lede" }, `${count} of ${CFG.total} images approved ${USE.for} and sent to Omar.`),
     h("button", { class: "ghost", type: "button", onclick: showSelection }, "Change the selection")));
   window.scrollTo(0, 0);
 }
@@ -896,7 +905,7 @@ function showResult(numbers) {
     download.disabled = true; download.textContent = "Building"; error.hidden = true;
     try {
       const url = URL.createObjectURL(await makeSheet(picked));
-      const link = h("a", { href: url, download: "Adada-Kabbani-approved-project-images.pdf" });
+      const link = h("a", { href: url, download: PDF_NAME });
       document.body.append(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60000);
     } catch {
@@ -923,7 +932,7 @@ function showResult(numbers) {
       h("div", { class: "head-main" },
         logo(),
         h("h1", { class: "title" }, "Approved images"),
-        h("p", { class: "lede" }, `${picked.length} of ${CFG.total} approved.`),
+        h("p", { class: "lede" }, `${picked.length} of ${CFG.total} approved ${USE.for}.`),
         lines.length ? h("div", { class: "numbers" }, ...lines.map((l) => h("p", {}, h("b", {}, l.title + ": "), l.nums))) : null,
         error),
       h("div", { class: "actions" }, download, copy)),
@@ -950,7 +959,7 @@ function start() {
 window.addEventListener("hashchange", () => { if (KEY) { closeViewer(); start(); } });
 (async () => {
   if (!window.crypto || !crypto.subtle) {
-    app.replaceChildren(card(h("h1", { class: "title" }, "Project images"), h("p", { class: "lede" }, "This browser cannot open the page. Please open the link in Safari or Chrome.")));
+    app.replaceChildren(card(h("h1", { class: "title" }, USE.title), h("p", { class: "lede" }, "This browser cannot open the page. Please open the link in Safari or Chrome.")));
     return;
   }
   const remembered = store.get(PASS_KEY);
