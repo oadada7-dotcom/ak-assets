@@ -393,7 +393,8 @@ function rememberSent(picked) {
   saveRemote(CFG.use, rec).then((ok) => { window.__akStore = ok; });
 }
 
-/* ---------- online store: one small JSON document; each entry is encrypted with the password key, filed under a hash of the username ---------- */
+/* ---------- online store (Firebase Realtime Database, REST): /ak/u/<hash of the username>/<form> = { iv, ct },
+   each entry encrypted with the password key, so the store only ever holds sealed notes ---------- */
 const STORE_MS = 9000;
 const b64e = (u8) => btoa(String.fromCharCode(...u8));
 let uhCache = null;
@@ -417,26 +418,24 @@ async function timedFetch(url, opts, ms) {
   const t = setTimeout(() => ctl.abort(), ms);
   try { return await fetch(url, { ...opts, signal: ctl.signal }); } finally { clearTimeout(t); }
 }
-async function storeGet() {
-  const url = MAN.store + (MAN.store.includes("?") ? "&" : "?") + "t=" + Date.now();
-  const r = await timedFetch(url, { cache: "no-store", headers: { Accept: "application/json" } }, STORE_MS);
+const storeUrl = (path) => String(MAN.store).replace(/\/+$/, "") + path + ".json";
+async function storeGet(path) {   // null when nothing is there yet
+  const r = await timedFetch(storeUrl(path), { cache: "no-store" }, STORE_MS);
   if (!r.ok) throw new Error("store " + r.status);
-  const doc = await r.json();
-  return doc && typeof doc === "object" && !Array.isArray(doc) ? doc : {};
+  return r.json();
 }
-async function storePut(doc) {
-  const r = await timedFetch(MAN.store, { method: "PUT", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(doc) }, STORE_MS);
+async function storePut(path, body) {
+  const r = await timedFetch(storeUrl(path) + "?print=silent", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }, STORE_MS);
   if (!r.ok) throw new Error("store " + r.status);
 }
 async function loadRemote() {
   if (!MAN || !MAN.store) return false;
   try {
-    const doc = await storeGet();
-    const mine = doc.u && doc.u[await userHash()];
+    const mine = await storeGet(`/ak/u/${await userHash()}`);
     const next = {};
     if (mine && typeof mine === "object") {
       for (const [u, rec] of Object.entries(mine)) {
-        if (!USES[u] || !rec) continue;
+        if (!USES[u] || !rec || typeof rec !== "object") continue;
         try { const d = await unsealRec(rec); if (d) next[u] = d; } catch { /* not ours: skip */ }
       }
     }
@@ -445,22 +444,17 @@ async function loadRemote() {
   } catch { return false; }   // offline or the store is down: the device notes still work
 }
 let storeQueue = Promise.resolve();
-function saveRemote(use, rec) {   // queued, so two saves from this page never overwrite each other
+function saveRemote(use, rec) {   // queued, so two saves from this page never overlap
   const job = storeQueue.then(async () => {
     if (!MAN || !MAN.store) return false;
+    const path = `/ak/u/${await userHash()}/${use}`;
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
-        const doc = await storeGet();            // never write blind: a failed read stops this attempt
-        doc.ak = 1;
-        if (!doc.u || typeof doc.u !== "object" || Array.isArray(doc.u)) doc.u = {};
-        const uh = await userHash();
-        if (!doc.u[uh] || typeof doc.u[uh] !== "object") doc.u[uh] = {};
-        const cur = doc.u[uh][use];
-        if (cur) {                               // a newer send from another device stays
+        const cur = await storeGet(path);        // never write blind: a failed read stops this attempt
+        if (cur && typeof cur === "object") {    // a newer send from another device stays
           try { const d = await unsealRec(cur); if (d && d.at >= rec.at) { REMOTE[use] = d; return true; } } catch { /* replace it */ }
         }
-        doc.u[uh][use] = await sealRec(rec);
-        await storePut(doc);
+        await storePut(path, await sealRec(rec));
         REMOTE[use] = rec;
         return true;
       } catch { /* try once more */ }
