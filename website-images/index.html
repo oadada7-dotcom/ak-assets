@@ -97,6 +97,14 @@ a.ghost { display: inline-flex; align-items: center; justify-content: center; te
 .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; padding: 24px 32px; border-radius: 28px; }
 .head-main { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
 .head-main .logo { margin-bottom: 10px; }
+.head-side { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.who { margin: 0; font-size: 13.5px; color: var(--mute); white-space: nowrap; }
+.who b { font-weight: 400; color: var(--ink-deep); }
+.linkbtn {
+  padding: 0; border: 0; background: none; color: var(--ink-deep); font: inherit; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(73, 65, 62, 0.4);
+}
+.linkbtn:hover { color: var(--oxblood); text-decoration-color: currentColor; }
 .chip {
   flex: none; padding: 7px 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.8); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
@@ -169,6 +177,7 @@ div.pic { cursor: default; }
   .legend { font-size: 12.5px; }
   .wrap { padding: 14px 14px 120px; }
   .head { flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px; border-radius: 24px; }
+  .head-side { align-items: flex-start; gap: 10px; }
   .head-main { gap: 6px; }
   .head-main .logo { height: 26px; margin-bottom: 8px; }
   .title { font-size: 28px; }
@@ -293,7 +302,7 @@ div.pic { cursor: default; }
 <div id="app"></div>
 <script>
 "use strict";
-const CFG = {"salt": "Iaj5uY4vwW/ZLFC7fWShWw==", "iter": 250000, "total": 300, "v": "9523ad18", "data": "../approval-data/d/", "use": "website"};
+const CFG = {"salt": "Iaj5uY4vwW/ZLFC7fWShWw==", "iter": 250000, "total": 300, "v": "9523ad18", "ns": "9523ad18", "mv": "4f0e6b75", "data": "../approval-data/d/", "use": "website"};
 const USES = {
   website: { label: "Website", title: "Images for the website", on: "on the website", for: "for the website", slug: "website", short: "website", colour: "#2F5D8A", path: "../website-images/" },
   profile: { label: "Company profile", title: "Images for the company profile", on: "in the company profile", for: "for the company profile", slug: "company-profile", short: "profile", colour: "#8A5617", path: "../profile-images/" },
@@ -306,8 +315,8 @@ const CHECK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-
 const LEFT = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const RIGHT = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-let KEY = null;          // AES key, derived from the passcode
-let MAN = null;          // decrypted manifest: { sections: [{id,name}], images: [{n,s,k,w,h,tw,th,name}], mail }
+let KEY = null;          // AES key, derived from the password
+let MAN = null;          // decrypted manifest: { sections: [{id,name}], images: [{n,s,k,w,h,tw,th,name}], mail, users: [names], store?: url }
 let SEL = new Set();     // approved image numbers (n)
 let sending = false;
 let failures = 0;
@@ -333,27 +342,156 @@ const pad2 = (k) => String(k).padStart(2, "0");
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch { /* convenience only */ } },
+  remove(k) { try { localStorage.removeItem(k); } catch { /* ignore */ } },
 };
-const SEL_KEY = "ak-sel:" + CFG.v + ":" + CFG.use;
-const PASS_KEY = "ak-pass:" + CFG.v;
+const NS = CFG.ns || CFG.v;     // storage names; unchanged when the files are re-versioned
+let USER = "";                  // signed-in username, lower case
+const selKey = () => `ak-sel:${NS}:${CFG.use}:${USER}`;
+const LOGIN_KEY = "ak-login:" + NS;
 const logo = () => h("img", { class: "logo", src: "logo.svg", alt: "Adada & Kabbani", width: 93, height: 30 });
 const secOf = (img) => MAN.sections[img.s];
 const eyebrow = (sec) => sec.eyebrow || `Project ${sec.id}`;
 const PDF_NAME = `Adada-Kabbani-${USE.slug}-approved-images.pdf`;
 const today = () => new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
-/* What this device already sent from the other two forms (same site, so the forms can read each other's notes). */
-const SENT_KEY = (u) => "ak-sent:" + CFG.v + ":" + u;
+/* What this person already sent from the other two forms: notes on this device, merged with the online store when there is one. */
+const SENT_KEY = (u) => `ak-sent:${NS}:${u}:${USER}`;
 let OTHER = {};   // use -> Set of image numbers approved and sent from that form
+let REMOTE = {};  // use -> { n, at } read from the online store
+function readLocal(u) {
+  try { const d = JSON.parse(store.get(SENT_KEY(u)) || "null"); return d && Array.isArray(d.n) && typeof d.at === "number" ? d : null; } catch { return null; }
+}
 function loadOthers() {
   OTHER = {};
   for (const u of Object.keys(USES)) {
     if (u === CFG.use) continue;
-    try { const d = JSON.parse(store.get(SENT_KEY(u)) || "null"); if (d && Array.isArray(d.n) && d.n.length) OTHER[u] = new Set(d.n); } catch { /* ignore */ }
+    const a = readLocal(u), b = REMOTE[u];
+    const best = !a ? b : !b ? a : (a.at >= b.at ? a : b);   // the most recent send wins
+    if (best && best.n.length) OTHER[u] = new Set(best.n);
+  }
+}
+function adoptLegacy() {
+  // Picks and sent notes saved on this device before sign-in existed go to the first person who signs in here.
+  // Old sent notes stay on this device only (never copied to the online store).
+  const moves = [["ak-sel:" + NS + ":" + CFG.use, selKey(), false]];
+  for (const u of Object.keys(USES)) moves.push(["ak-sent:" + NS + ":" + u, SENT_KEY(u), true]);
+  for (const [from, to, sent] of moves) {
+    const v = store.get(from);
+    if (v == null) continue;
+    if (store.get(to) == null) {
+      let keep = v;
+      if (sent) { try { const d = JSON.parse(v); d.dev = 1; keep = JSON.stringify(d); } catch { keep = null; } }
+      if (keep != null) store.set(to, keep);
+    }
+    store.remove(from);
   }
 }
 const othersFor = (n) => Object.keys(OTHER).filter((u) => OTHER[u].has(n));
-function rememberSent(picked) { store.set(SENT_KEY(CFG.use), JSON.stringify({ n: picked.map((i) => i.n), at: Date.now() })); }
+function rememberSent(picked) {
+  const rec = { n: picked.map((i) => i.n), at: Date.now() };
+  store.set(SENT_KEY(CFG.use), JSON.stringify(rec));
+  saveRemote(CFG.use, rec).then((ok) => { window.__akStore = ok; });
+}
+
+/* ---------- online store: one small JSON document; each entry is encrypted with the password key, filed under a hash of the username ---------- */
+const STORE_MS = 9000;
+const b64e = (u8) => btoa(String.fromCharCode(...u8));
+let uhCache = null;
+async function userHash() {
+  if (uhCache && uhCache.u === USER) return uhCache.h;
+  const d = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("user:" + USER)));
+  uhCache = { u: USER, h: [...d.slice(0, 8)].map((x) => x.toString(16).padStart(2, "0")).join("") };
+  return uhCache.h;
+}
+async function sealRec(obj) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, KEY, new TextEncoder().encode(JSON.stringify(obj))));
+  return { iv: b64e(iv), ct: b64e(ct) };
+}
+async function unsealRec(rec) {
+  const d = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(rec.iv) }, KEY, b64(rec.ct))));
+  return d && Array.isArray(d.n) && typeof d.at === "number" ? { n: d.n, at: d.at } : null;
+}
+async function timedFetch(url, opts, ms) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try { return await fetch(url, { ...opts, signal: ctl.signal }); } finally { clearTimeout(t); }
+}
+async function storeGet() {
+  const url = MAN.store + (MAN.store.includes("?") ? "&" : "?") + "t=" + Date.now();
+  const r = await timedFetch(url, { cache: "no-store", headers: { Accept: "application/json" } }, STORE_MS);
+  if (!r.ok) throw new Error("store " + r.status);
+  const doc = await r.json();
+  return doc && typeof doc === "object" && !Array.isArray(doc) ? doc : {};
+}
+async function storePut(doc) {
+  const r = await timedFetch(MAN.store, { method: "PUT", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(doc) }, STORE_MS);
+  if (!r.ok) throw new Error("store " + r.status);
+}
+async function loadRemote() {
+  if (!MAN || !MAN.store) return false;
+  try {
+    const doc = await storeGet();
+    const mine = doc.u && doc.u[await userHash()];
+    const next = {};
+    if (mine && typeof mine === "object") {
+      for (const [u, rec] of Object.entries(mine)) {
+        if (!USES[u] || !rec) continue;
+        try { const d = await unsealRec(rec); if (d) next[u] = d; } catch { /* not ours: skip */ }
+      }
+    }
+    REMOTE = next;
+    return true;
+  } catch { return false; }   // offline or the store is down: the device notes still work
+}
+let storeQueue = Promise.resolve();
+function saveRemote(use, rec) {   // queued, so two saves from this page never overwrite each other
+  const job = storeQueue.then(async () => {
+    if (!MAN || !MAN.store) return false;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        const doc = await storeGet();            // never write blind: a failed read stops this attempt
+        doc.ak = 1;
+        if (!doc.u || typeof doc.u !== "object" || Array.isArray(doc.u)) doc.u = {};
+        const uh = await userHash();
+        if (!doc.u[uh] || typeof doc.u[uh] !== "object") doc.u[uh] = {};
+        const cur = doc.u[uh][use];
+        if (cur) {                               // a newer send from another device stays
+          try { const d = await unsealRec(cur); if (d && d.at >= rec.at) { REMOTE[use] = d; return true; } } catch { /* replace it */ }
+        }
+        doc.u[uh][use] = await sealRec(rec);
+        await storePut(doc);
+        REMOTE[use] = rec;
+        return true;
+      } catch { /* try once more */ }
+    }
+    return false;
+  });
+  storeQueue = job.catch(() => false);
+  return job;
+}
+async function syncUp() {   // a send this device made while the store was out of reach goes up now
+  for (const u of Object.keys(USES)) {
+    const a = readLocal(u), b = REMOTE[u];
+    if (a && !a.dev && (!b || a.at > b.at)) await saveRemote(u, a);
+  }
+}
+let lastRemote = 0;
+async function refreshFromRemote() {
+  if (MAN && MAN.store) {
+    lastRemote = Date.now();
+    if (await loadRemote()) syncUp();
+  }
+  loadOthers();
+  if (tiles.size) refreshMarks();
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && KEY && tiles.size && Date.now() - lastRemote > 15000) refreshFromRemote();
+});
+function signOut() {
+  store.remove(LOGIN_KEY);
+  location.replace(location.pathname + location.search);
+}
 const CHECK_S = CHECK.replace('width="16" height="16"', 'width="11" height="11"');
 function markEls(n) {
   return othersFor(n).map((u) => h("span", { class: "mark", style: `background:${USES[u].colour}` },
@@ -390,10 +528,10 @@ async function deriveKey(pass) {
   const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass.trim().toLowerCase()), "PBKDF2", false, ["deriveKey"]);
   return crypto.subtle.deriveKey(
     { name: "PBKDF2", salt: b64(CFG.salt), iterations: CFG.iter, hash: "SHA-256" },
-    base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+    base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
 }
 async function fetchBytes(name) {
-  const r = await fetch((CFG.data || "d/") + name + ".bin?v=" + CFG.v);
+  const r = await fetch((CFG.data || "d/") + name + ".bin?v=" + (name === "m" && CFG.mv ? CFG.mv : CFG.v));
   if (!r.ok) throw new Error("network");
   return new Uint8Array(await r.arrayBuffer());
 }
@@ -420,16 +558,18 @@ function full(n) {
 }
 
 /* ---------- gate ---------- */
-async function unlock(pass) {
+async function unlock(user, pass) {
+  const u = String(user || "").trim().toLowerCase();
   const key = await deriveKey(pass);
   const sealed = await fetchBytes("m");        // throws "network" if offline
   let plain;
   try { plain = await decrypt(sealed, key); } catch { throw new Error("wrong"); }
-  KEY = key;
-  MAN = JSON.parse(new TextDecoder().decode(plain));
+  const man = JSON.parse(new TextDecoder().decode(plain));
+  if (!u || !Array.isArray(man.users) || !man.users.includes(u)) throw new Error("wrong");
+  KEY = key; USER = u; MAN = man;
   MAN.sections.forEach((sec, i) => { sec.index = i; sec.items = []; });
   MAN.images.forEach((img, i) => { img.i = i; MAN.sections[img.s].items.push(img); });
-  store.set(PASS_KEY, pass.trim().toLowerCase());
+  store.set(LOGIN_KEY, JSON.stringify({ u, p: pass.trim().toLowerCase() }));
 }
 
 function card(...kids) {
@@ -437,29 +577,31 @@ function card(...kids) {
 }
 
 function showGate(message) {
-  const input = h("input", { id: "code", class: "input", autocomplete: "off", autocapitalize: "none", autocorrect: "off", spellcheck: "false", "aria-describedby": "code-error" });
+  const userIn = h("input", { id: "user", class: "input", name: "username", autocomplete: "username", autocapitalize: "none", autocorrect: "off", spellcheck: "false", "aria-describedby": "code-error" });
+  const input = h("input", { id: "code", class: "input", name: "password", type: "password", autocomplete: "current-password", "aria-describedby": "code-error" });
   const error = h("p", { id: "code-error", class: "error", role: "alert", hidden: !message }, message || "");
   const button = h("button", { class: "primary", type: "submit" }, "Continue");
   const form = h("form", { class: "gate", onsubmit: async (e) => {
     e.preventDefault();
-    if (!input.value.trim() || button.disabled) return;
+    if (!userIn.value.trim() || !input.value.trim() || button.disabled) return;
     button.disabled = true; button.textContent = "Checking"; error.hidden = true;
     try {
-      await unlock(input.value);
+      await unlock(userIn.value, input.value);
       start();
     } catch (err) {
-      error.textContent = err.message === "wrong" ? "That passcode is not correct." : "The page could not load. Check your connection and try again.";
+      error.textContent = err.message === "wrong" ? "That username or password is not correct." : "The page could not load. Check your connection and try again.";
       error.hidden = false; button.disabled = false; button.textContent = "Continue";
     }
-  } }, h("label", { class: "label", for: "code" }, "Passcode"), input, error, button);
+  } }, h("label", { class: "label", for: "user" }, "Username"), userIn,
+     h("label", { class: "label", for: "code", style: "margin-top:10px" }, "Password"), input, error, button);
   app.replaceChildren(card(
     h("h1", { class: "title" }, location.hash.startsWith("#r-") ? "Approved images" : USE.title),
-    h("p", { class: "lede" }, "Enter the passcode to view the images."), form));
+    h("p", { class: "lede" }, "Sign in to view the images."), form));
 }
 
 /* ---------- selection ---------- */
 const approved = () => MAN.images.filter((i) => SEL.has(i.n));
-function saveSel() { store.set(SEL_KEY, JSON.stringify([...SEL])); }
+function saveSel() { store.set(selKey(), JSON.stringify([...SEL])); }
 
 let barCount, barHint, barSubmit, barError, tiles = new Map(), secUI = [], viewerState = null;
 const SEND_MS = 20000;   // attachment request: base time limit, plus 10 s per MB of PDF
@@ -571,7 +713,10 @@ function showSelection() {
           h("h1", { class: "title" }, USE.title),
           h("p", { class: "lede" }, `The project images, grouped by project. Approve the ones to use ${USE.on}. Tap Approve under each image you want, or Approve all to take a whole section. Tap an image to see it larger. When you are finished, press Submit at the bottom.`),
           (legendEl = h("p", { class: "legend", hidden: true }))),
-        h("span", { class: "chip" }, `${CFG.total} images · ${MAN.sections.length} sections`)),
+        h("div", { class: "head-side" },
+          h("span", { class: "chip" }, `${CFG.total} images · ${MAN.sections.length} sections`),
+          h("p", { class: "who" }, "Signed in as ", h("b", {}, USER), " · ",
+            h("button", { type: "button", class: "linkbtn", id: "sign-out", onclick: signOut }, "Sign out")))),
       ...sections),
     bar);
   MAN.images.forEach((img) => paintTile(img.n));
@@ -861,13 +1006,15 @@ async function makeSheetForEmail(picked) {
 }
 
 /* ---------- submit ---------- */
+const subjectLine = (picked) => `Adada & Kabbani · ${USE.label} images: ${picked.length} of ${CFG.total} approved by ${USER}`;
 async function sendEmail(picked, pdf) {
   const base = location.origin + location.pathname;
   const fields = {
-    _subject: `Adada & Kabbani · ${USE.label} images: ${picked.length} of ${CFG.total} approved`,
+    _subject: subjectLine(picked),
     _template: "table",
     _captcha: "false",
     "Approved for": USE.label,
+    "Approved by": USER,
     "Approved": `${picked.length} of ${CFG.total}`,
   };
   for (const g of groups(picked)) {
@@ -924,7 +1071,7 @@ async function submit() {
 
 /* sending failed: try again, or hand the selection to the mail app */
 function selectionText(picked) {
-  return [`Approved ${USE.for}: ${picked.length} of ${CFG.total} images`, "",
+  return [`Approved ${USE.for}: ${picked.length} of ${CFG.total} images`, `Approved by: ${USER}`, "",
     ...numberLines(picked).map((l) => `${l.title}: ${l.nums}`), "",
     `Contact sheet: ${location.origin + location.pathname}#r-${encodeSel(picked)}`].join("\n");
 }
@@ -934,7 +1081,7 @@ function mailAddress() {
 function showNotSent(picked, result) {
   const text = selectionText(picked);
   const to = mailAddress();
-  const subject = `Adada & Kabbani · ${USE.label} images: ${picked.length} of ${CFG.total} approved`;
+  const subject = subjectLine(picked);
   const mail = to ? h("a", { class: "ghost", id: "mail-selection", onclick: () => rememberSent(picked),
     href: `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text.replace(/\n/g, "\r\n"))}` }, "Email the selection") : null;
   const detail = result && result.message && !/^(timeout|Failed to fetch|Load failed|NetworkError.*)$/i.test(result.message) && result.message.length < 240 ? result.message : null;
@@ -1012,10 +1159,11 @@ function showResult(numbers) {
 
 /* ---------- boot ---------- */
 window.addEventListener("storage", (e) => {
-  if (e.key && e.key.startsWith("ak-sent:" + CFG.v + ":") && KEY && tiles.size) { loadOthers(); refreshMarks(); }
+  if (e.key && e.key.startsWith("ak-sent:" + NS + ":") && KEY && tiles.size) { loadOthers(); refreshMarks(); }
 });
-window.addEventListener("pageshow", (e) => { if (e.persisted && KEY && tiles.size) { loadOthers(); refreshMarks(); } });
+window.addEventListener("pageshow", (e) => { if (e.persisted && KEY && tiles.size) refreshFromRemote(); });
 function start() {
+  adoptLegacy();
   loadOthers();
   const m = location.hash.match(/^#r-([A-Za-z0-9_-]+)$/);
   if (m) {
@@ -1025,11 +1173,12 @@ function start() {
     return;
   }
   try {
-    const saved = JSON.parse(store.get(SEL_KEY) || "[]");
+    const saved = JSON.parse(store.get(selKey()) || "[]");
     const valid = new Set(MAN.images.map((i) => i.n));
     SEL = new Set(Array.isArray(saved) ? saved.filter((n) => valid.has(n)) : []);
   } catch { SEL = new Set(); }
   showSelection();
+  refreshFromRemote();
 }
 window.addEventListener("hashchange", () => { if (KEY) { closeViewer(); start(); } });
 (async () => {
@@ -1037,10 +1186,12 @@ window.addEventListener("hashchange", () => { if (KEY) { closeViewer(); start();
     app.replaceChildren(card(h("h1", { class: "title" }, USE.title), h("p", { class: "lede" }, "This browser cannot open the page. Please open the link in Safari or Chrome.")));
     return;
   }
-  const remembered = store.get(PASS_KEY);
-  if (remembered) {
+  store.remove("ak-pass:" + NS);   // the old passcode-only sign-in
+  let remembered = null;
+  try { remembered = JSON.parse(store.get(LOGIN_KEY) || "null"); } catch { remembered = null; }
+  if (remembered && remembered.u && remembered.p) {
     app.replaceChildren(card(h("p", { class: "note", style: "margin-top:24px" }, "Loading")));
-    try { await unlock(remembered); start(); return; } catch { /* fall through to the gate */ }
+    try { await unlock(remembered.u, remembered.p); start(); return; } catch (err) { if (err.message === "wrong") store.remove(LOGIN_KEY); }
   }
   showGate();
 })();
