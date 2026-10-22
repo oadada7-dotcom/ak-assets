@@ -112,7 +112,22 @@ a.ghost { display: inline-flex; align-items: center; justify-content: center; te
 
 .grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .tile { position: relative; display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 8px; border-radius: 20px; }
+.tile[data-other="1"] { box-shadow: 0 0 0 2px var(--ring1), var(--glass-shadow); }
+.tile[data-other="2"] { box-shadow: 0 0 0 2px var(--ring1), 0 0 0 4px var(--ring2), var(--glass-shadow); }
 .tile[data-on="true"] { box-shadow: 0 0 0 2px var(--ok), var(--glass-shadow); }
+.marks { position: absolute; left: 8px; right: 8px; bottom: 8px; display: flex; flex-wrap: wrap; gap: 4px; pointer-events: none; }
+.mark {
+  display: inline-flex; align-items: center; gap: 4px; max-width: 100%; padding: 3px 9px 3px 7px; border-radius: 999px;
+  color: #fff; font-size: 11.5px; line-height: 1.3; letter-spacing: 0.02em; white-space: nowrap; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+.mark .mi { display: inline-flex; }
+.mark .mi svg { width: 11px; height: 11px; }
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: 4px 0 0; font-size: 13.5px; color: var(--mute); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-deep); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+.next-forms { align-self: stretch; margin-top: 26px; padding-top: 18px; border-top: 1px solid rgba(73, 65, 62, 0.18); display: flex; flex-direction: column; gap: 10px; }
+.next-forms a { color: var(--ink-deep); font-size: 16px; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(73, 65, 62, 0.35); }
+.next-forms a:hover { color: var(--oxblood); text-decoration-color: currentColor; }
 .pic {
   position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; padding: 0; border: 0;
   border-radius: 13px; overflow: hidden; background: rgba(255, 255, 255, 0.3); cursor: zoom-in;
@@ -147,6 +162,11 @@ div.pic { cursor: default; }
 }
 @media (min-width: 1040px) { .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; } }
 @media (max-width: 719px) {
+  .marks { left: 6px; right: 6px; bottom: 6px; }
+  .mark { font-size: 10.5px; padding: 2px 7px 2px 6px; }
+  .marks .mark .pre { display: none; }
+  .marks .mark .w { text-transform: capitalize; }
+  .legend { font-size: 12.5px; }
   .wrap { padding: 14px 14px 120px; }
   .head { flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px; border-radius: 24px; }
   .head-main { gap: 6px; }
@@ -200,6 +220,8 @@ div.pic { cursor: default; }
   .viewer { background: rgba(28, 24, 22, 0.84); -webkit-backdrop-filter: blur(30px) saturate(120%); backdrop-filter: blur(30px) saturate(120%); }
 }
 .viewer-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(24px + env(safe-area-inset-top, 0px)) 32px 0; }
+.vleft { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+.vmarks { display: flex; gap: 6px; flex-wrap: wrap; }
 .vchip {
   padding: 9px 18px; border-radius: 999px; background: rgba(255, 255, 255, 0.10); border: 1px solid rgba(255, 255, 255, 0.18);
   font-size: 14px; letter-spacing: 0.1em; font-variant-numeric: tabular-nums;
@@ -273,9 +295,9 @@ div.pic { cursor: default; }
 "use strict";
 const CFG = {"salt": "Iaj5uY4vwW/ZLFC7fWShWw==", "iter": 250000, "total": 300, "v": "9523ad18", "data": "../approval-data/d/", "use": "profile"};
 const USES = {
-  website: { label: "Website", title: "Images for the website", on: "on the website", for: "for the website", slug: "website" },
-  profile: { label: "Company profile", title: "Images for the company profile", on: "in the company profile", for: "for the company profile", slug: "company-profile" },
-  hospitality: { label: "Hospitality presentation", title: "Images for the hospitality presentation", on: "in the hospitality presentation", for: "for the hospitality presentation", slug: "hospitality-presentation" },
+  website: { label: "Website", title: "Images for the website", on: "on the website", for: "for the website", slug: "website", short: "website", colour: "#2F5D8A", path: "../website-images/" },
+  profile: { label: "Company profile", title: "Images for the company profile", on: "in the company profile", for: "for the company profile", slug: "company-profile", short: "profile", colour: "#8A5617", path: "../profile-images/" },
+  hospitality: { label: "Hospitality presentation", title: "Images for the hospitality presentation", on: "in the hospitality presentation", for: "for the hospitality presentation", slug: "hospitality-presentation", short: "hospitality", colour: "#6B3F72", path: "../hospitality-images/" },
 };
 const USE = USES[CFG.use] || USES.profile;
 const app = document.getElementById("app");
@@ -319,6 +341,48 @@ const secOf = (img) => MAN.sections[img.s];
 const eyebrow = (sec) => sec.eyebrow || `Project ${sec.id}`;
 const PDF_NAME = `Adada-Kabbani-${USE.slug}-approved-images.pdf`;
 const today = () => new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+/* What this device already sent from the other two forms (same site, so the forms can read each other's notes). */
+const SENT_KEY = (u) => "ak-sent:" + CFG.v + ":" + u;
+let OTHER = {};   // use -> Set of image numbers approved and sent from that form
+function loadOthers() {
+  OTHER = {};
+  for (const u of Object.keys(USES)) {
+    if (u === CFG.use) continue;
+    try { const d = JSON.parse(store.get(SENT_KEY(u)) || "null"); if (d && Array.isArray(d.n) && d.n.length) OTHER[u] = new Set(d.n); } catch { /* ignore */ }
+  }
+}
+const othersFor = (n) => Object.keys(OTHER).filter((u) => OTHER[u].has(n));
+function rememberSent(picked) { store.set(SENT_KEY(CFG.use), JSON.stringify({ n: picked.map((i) => i.n), at: Date.now() })); }
+const CHECK_S = CHECK.replace('width="16" height="16"', 'width="11" height="11"');
+function markEls(n) {
+  return othersFor(n).map((u) => h("span", { class: "mark", style: `background:${USES[u].colour}` },
+    h("span", { class: "mi", html: CHECK_S }), h("span", { class: "pre" }, "Approved for "), h("span", { class: "w" }, USES[u].short)));
+}
+function applyMarks(t, n) {
+  const others = othersFor(n);
+  t.marks.replaceChildren(...markEls(n));
+  t.marks.hidden = !others.length;
+  if (others.length) {
+    t.li.dataset.other = String(Math.min(others.length, 2));
+    t.li.style.setProperty("--ring1", USES[others[0]].colour);
+    if (others[1]) t.li.style.setProperty("--ring2", USES[others[1]].colour);
+  } else delete t.li.dataset.other;
+  const img = MAN.images[n - 1];
+  t.picBtn.setAttribute("aria-label", `View image ${pad2(img.k)}, ${secOf(img).name}, larger` + (others.length ? `. Approved for ${others.map((u) => USES[u].short).join(" and ")}.` : ""));
+}
+function legendKids() {
+  const used = Object.keys(OTHER);
+  if (!used.length) return [];
+  return ["Outlined images were already approved in your other forms:",
+    ...used.map((u) => h("span", {}, h("i", { style: `background:${USES[u].colour}` }), `${USES[u].label} (${OTHER[u].size})`))];
+}
+let legendEl = null;
+function refreshMarks() {
+  for (const [n, t] of tiles) applyMarks(t, n);
+  if (legendEl) { legendEl.replaceChildren(...legendKids()); legendEl.hidden = !Object.keys(OTHER).length; }
+  if (viewerState) paintViewer();
+}
 
 /* ---------- crypto ---------- */
 const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
@@ -478,11 +542,11 @@ function showSelection() {
       const pic = h("img", { alt: `Image ${pad2(img.k)}, ${sec.name}`, width: img.tw, height: img.th, "data-n": img.n, decoding: "async" });
       const tick = h("span", { class: "tick", html: CHECK, hidden: true });
       const btn = h("button", { type: "button", class: "approve", id: "approve-" + img.n, onclick: () => toggle(img.n) });
-      const li = h("li", { class: "tile glass" },
-        h("button", { type: "button", class: "pic", "aria-label": `View image ${pad2(img.k)}, ${sec.name}, larger`, onclick: (e) => openViewer(img.i, e.currentTarget) },
-          pic, h("span", { class: "num" }, pad2(img.k)), tick),
-        btn);
-      tiles.set(img.n, { li, tick, btn });
+      const marks = h("span", { class: "marks", hidden: true });
+      const picBtn = h("button", { type: "button", class: "pic", "aria-label": `View image ${pad2(img.k)}, ${sec.name}, larger`, onclick: (e) => openViewer(img.i, e.currentTarget) },
+        pic, h("span", { class: "num" }, pad2(img.k)), tick, marks);
+      const li = h("li", { class: "tile glass" }, picBtn, btn);
+      tiles.set(img.n, { li, tick, btn, marks, picBtn });
       grid.append(li);
       if (io) io.observe(pic); else loadThumb(pic);
     }
@@ -505,12 +569,14 @@ function showSelection() {
         h("div", { class: "head-main" },
           logo(),
           h("h1", { class: "title" }, USE.title),
-          h("p", { class: "lede" }, `The project images, grouped by project. Approve the ones to use ${USE.on}. Tap Approve under each image you want, or Approve all to take a whole section. Tap an image to see it larger. When you are finished, press Submit at the bottom.`)),
+          h("p", { class: "lede" }, `The project images, grouped by project. Approve the ones to use ${USE.on}. Tap Approve under each image you want, or Approve all to take a whole section. Tap an image to see it larger. When you are finished, press Submit at the bottom.`),
+          (legendEl = h("p", { class: "legend", hidden: true }))),
         h("span", { class: "chip" }, `${CFG.total} images · ${MAN.sections.length} sections`)),
       ...sections),
     bar);
   MAN.images.forEach((img) => paintTile(img.n));
   MAN.sections.forEach((_, si) => paintSection(si));
+  refreshMarks();
   paintBar();
 }
 
@@ -518,6 +584,7 @@ function showSelection() {
 function openViewer(index, opener) {
   const img = h("img", { alt: "" });
   const counter = h("span", { class: "vchip" });
+  const vmarks = h("span", { class: "vmarks" });
   const project = h("p", { class: "vproject" });
   const prev = h("button", { type: "button", class: "vbtn", "aria-label": "Previous image", html: LEFT, onclick: () => moveViewer(-1) });
   const next = h("button", { type: "button", class: "vbtn", "aria-label": "Next image", html: RIGHT, onclick: () => moveViewer(1) });
@@ -533,10 +600,10 @@ function openViewer(index, opener) {
       if (Math.abs(dx) > 48) moveViewer(dx < 0 ? 1 : -1);
     } }, img);
   const el = h("div", { class: "viewer", role: "dialog", "aria-modal": "true" },
-    h("div", { class: "viewer-top" }, counter, close),
+    h("div", { class: "viewer-top" }, h("div", { class: "vleft" }, counter, vmarks), close),
     stage, project,
     h("div", { class: "viewer-ctl" }, prev, approveBtn, next));
-  viewerState = { index, el, img, counter, project, prev, next, approveBtn, opener, overflow: document.body.style.overflow };
+  viewerState = { index, el, img, counter, vmarks, project, prev, next, approveBtn, opener, overflow: document.body.style.overflow };
   document.body.style.overflow = "hidden";
   document.body.append(el);
   paintViewer(true);
@@ -548,6 +615,7 @@ function paintViewer(imageChanged) {
   const sec = secOf(item);
   const on = SEL.has(item.n);
   v.counter.textContent = `${pad2(item.k)} / ${pad2(sec.items.length)}`;
+  v.vmarks.replaceChildren(...markEls(item.n));
   v.project.textContent = `${eyebrow(sec)} · ${sec.name}`;
   v.el.setAttribute("aria-label", `Image ${pad2(item.k)}, ${sec.name}`);
   v.prev.disabled = v.index === 0;
@@ -849,7 +917,7 @@ async function submit() {
   window.__lastSend = result;
   sending = false;
   closeViewer();
-  if (result.ok) { failures = 0; showDone(picked.length); return; }
+  if (result.ok) { failures = 0; rememberSent(picked); showDone(picked.length); return; }
   failures += 1;
   showNotSent(picked, result);
 }
@@ -867,7 +935,7 @@ function showNotSent(picked, result) {
   const text = selectionText(picked);
   const to = mailAddress();
   const subject = `Adada & Kabbani · ${USE.label} images: ${picked.length} of ${CFG.total} approved`;
-  const mail = to ? h("a", { class: "ghost", id: "mail-selection",
+  const mail = to ? h("a", { class: "ghost", id: "mail-selection", onclick: () => rememberSent(picked),
     href: `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text.replace(/\n/g, "\r\n"))}` }, "Email the selection") : null;
   const detail = result && result.message && !/^(timeout|Failed to fetch|Load failed|NetworkError.*)$/i.test(result.message) && result.message.length < 240 ? result.message : null;
   app.replaceChildren(card(
@@ -890,7 +958,9 @@ function showDone(count) {
     h("div", { class: "done-mark", html: CHECK.replace(/width="16" height="16"/, 'width="30" height="30"').replace('stroke-width="2.8"', 'stroke-width="2.4"') }),
     h("h1", { class: "title" }, "Sent. Thank you."),
     h("p", { class: "lede" }, `${count} of ${CFG.total} images approved ${USE.for} and sent to Omar.`),
-    h("button", { class: "ghost", type: "button", onclick: showSelection }, "Change the selection")));
+    h("button", { class: "ghost", type: "button", onclick: showSelection }, "Change the selection"),
+    h("div", { class: "next-forms" }, h("p", { class: "label" }, "Also to approve"),
+      ...Object.keys(USES).filter((u) => u !== CFG.use).map((u) => h("a", { href: USES[u].path, id: "next-" + u }, USES[u].title)))));
   window.scrollTo(0, 0);
 }
 
@@ -941,7 +1011,12 @@ function showResult(numbers) {
 }
 
 /* ---------- boot ---------- */
+window.addEventListener("storage", (e) => {
+  if (e.key && e.key.startsWith("ak-sent:" + CFG.v + ":") && KEY && tiles.size) { loadOthers(); refreshMarks(); }
+});
+window.addEventListener("pageshow", (e) => { if (e.persisted && KEY && tiles.size) { loadOthers(); refreshMarks(); } });
 function start() {
+  loadOthers();
   const m = location.hash.match(/^#r-([A-Za-z0-9_-]+)$/);
   if (m) {
     let nums = [];
