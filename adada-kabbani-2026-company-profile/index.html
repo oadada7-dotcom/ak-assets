@@ -34,93 +34,47 @@ header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-c
   border:0;border-radius:999px;padding:9px 16px;cursor:pointer;white-space:nowrap;text-decoration:none}
 .btn:hover{background:var(--accent-hi)}
 .btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-#progress{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--accent-hi);transition:width .2s}
 main{display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px 16px 48px}
-#status{max-width:1200px;width:100%;font-size:14px;color:var(--muted);text-align:center;padding:24px 0}
-#status a{color:var(--ink)}
-.page{position:relative;width:min(1200px,100%,calc((100dvh - 100px) * 1.4143));aspect-ratio:var(--ar,842/595.5);background:#F4F1EA;border-radius:4px;
+.page{width:min(1200px,100%,calc((100vh - 100px) * 1.4144));background:#EDE9E1;border-radius:4px;
   box-shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35);overflow:hidden}
-.page canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.page img{display:block;width:100%;height:auto;aspect-ratio:3369/2382}
 @media (max-width:560px){.sub{display:none}.mark{font-size:11px;letter-spacing:.16em}#count{display:none}main{gap:10px;padding-top:12px}}
-@media (prefers-reduced-motion:reduce){#progress{transition:none}}
 </style>
 </head>
 <body>
 <header>
   <div class="brand"><div class="mark">Adada <b>&amp;</b> Kabbani</div><div class="sub">Company Profile 2026</div></div>
-  <div class="tools"><span id="count" aria-live="polite"></span>
-    <a class="btn" id="dl" href="../adada-kabbani-2026-company-profile.pdf" download="Adada-Kabbani-Company-Profile-2026.pdf">Download PDF</a></div>
-  <div id="progress" aria-hidden="true"></div>
+  <div class="tools"><span id="count" aria-live="polite">1 / 144</span>
+    <a class="btn" href="../adada-kabbani-2026-company-profile.pdf" download="Adada-Kabbani-Company-Profile-2026.pdf">Download PDF</a></div>
 </header>
-<main id="pages">
-  <div id="status">Opening the company profile…</div>
-</main>
-<script src="pdf.min.js"></script>
+<main id="pages"></main>
+<noscript><p style="text-align:center"><a href="../adada-kabbani-2026-company-profile.pdf" style="color:#F4F1EA">Open the company profile (PDF)</a></p></noscript>
 <script>
 (function(){
-  var PDF_URL = "../adada-kabbani-2026-company-profile.pdf";
-  var pagesEl = document.getElementById("pages"), statusEl = document.getElementById("status");
-  var countEl = document.getElementById("count"), bar = document.getElementById("progress");
-  var total = 0, pdf = null;
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "pdf.worker.min.js";
-
-  function fail(){
-    statusEl.innerHTML = 'The profile couldn’t be displayed here. <a href="' + PDF_URL + '">Open the PDF directly</a>.';
-    statusEl.hidden = false; bar.style.width = "0";
+  var TOTAL = 144, main = document.getElementById("pages"), count = document.getElementById("count");
+  var frag = document.createDocumentFragment();
+  for(var i = 1; i <= TOTAL; i++){
+    var n = ("00" + i).slice(-3);
+    var sec = document.createElement("section"); sec.className = "page"; sec.id = "p" + i; sec.dataset.n = i;
+    var img = document.createElement("img");
+    img.width = 3369; img.height = 2382; img.alt = "Page " + i + " of " + TOTAL;
+    img.decoding = "async"; if(i > 2) img.loading = "lazy";
+    img.sizes = "(max-width: 1232px) calc(100vw - 32px), 1200px";
+    img.srcset = "pages/m/p" + n + ".jpg 1685w, pages/p" + n + ".jpg 3369w";
+    img.src = "pages/p" + n + ".jpg";
+    img.onerror = function(){ var el = this; if(el.dataset.retry) return; el.dataset.retry = "1";
+      setTimeout(function(){ el.srcset = el.srcset.replace(/\.jpg/g, ".jpg?r=1"); el.src = el.src + "?r=1"; }, 1500); };
+    sec.appendChild(img); frag.appendChild(sec);
   }
-
-  // Render a page when it comes near the screen; drop its canvas when it is far away, so phones keep memory free.
-  function show(h){
-    if(h.dataset.state) return;
-    var n = +h.dataset.n; h.dataset.state = "rendering";
-    pdf.getPage(n).then(function(page){
-      if(h.dataset.state !== "rendering") return;
-      var base = page.getViewport({scale:1});
-      var dpr = Math.min(window.devicePixelRatio || 1, 2.5);
-      var vp = page.getViewport({scale: Math.max(1, h.clientWidth * dpr / base.width)});
-      var c = document.createElement("canvas"); c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
-      c.setAttribute("role", "img"); c.setAttribute("aria-label", "Page " + n + " of " + total);
-      var task = page.render({canvasContext: c.getContext("2d"), viewport: vp});
-      h._task = task;
-      return task.promise.then(function(){
-        h._task = null;
-        if(h.dataset.state !== "rendering"){ c.width = c.height = 0; return; }
-        h.textContent = ""; h.appendChild(c); h.dataset.state = "done";
-      });
-    }).catch(function(){ if(h.dataset.state === "rendering") h.dataset.state = ""; });
+  main.appendChild(frag);
+  if("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting) count.textContent = e.target.dataset.n + " / " + TOTAL; });
+    }, {rootMargin: "-45% 0px -45% 0px"});
+    main.querySelectorAll(".page").forEach(function(s){ io.observe(s); });
   }
-  function hide(h){
-    if(!h.dataset.state) return;
-    if(h._task){ try{ h._task.cancel(); }catch(e){} h._task = null; }
-    var c = h.querySelector("canvas"); if(c){ c.width = c.height = 0; c.remove(); }
-    h.dataset.state = "";
-  }
-
-  pdfjsLib.getDocument({url: PDF_URL, rangeChunkSize: 1048576, disableAutoFetch: true, disableStream: true}).promise
-  .then(async function(doc){
-    pdf = doc; total = pdf.numPages;
-    var first = (await pdf.getPage(1)).getViewport({scale:1});
-    document.documentElement.style.setProperty("--ar", first.width + "/" + first.height);
-    statusEl.hidden = true;
-    var holders = [];
-    for(var i = 1; i <= total; i++){
-      var h = document.createElement("section"); h.className = "page"; h.id = "p" + i; h.dataset.n = i;
-      pagesEl.appendChild(h); holders.push(h);
-    }
-    countEl.textContent = "1 / " + total;
-    if("IntersectionObserver" in window){
-      var near = new IntersectionObserver(function(es){
-        es.forEach(function(e){ if(e.isIntersecting) show(e.target); else hide(e.target); });
-      }, {rootMargin: "1200px 0px"});
-      holders.forEach(function(h){ near.observe(h); });
-      var mid = new IntersectionObserver(function(es){
-        es.forEach(function(e){ if(e.isIntersecting) countEl.textContent = e.target.dataset.n + " / " + total; });
-      }, {rootMargin: "-45% 0px -45% 0px"});
-      holders.forEach(function(h){ mid.observe(h); });
-    } else { holders.slice(0, 4).forEach(show); }
-    var m = /^#p(\d+)$/.exec(location.hash);
-    if(m){ var t = document.getElementById("p" + m[1]); if(t) t.scrollIntoView(); }
-  }, fail);
+  var m = /^#p(\d+)$/.exec(location.hash);
+  if(m){ var t = document.getElementById("p" + m[1]); if(t){ t.querySelector("img").loading = "eager"; t.scrollIntoView(); } }
 })();
 </script>
 </body>
