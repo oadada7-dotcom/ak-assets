@@ -24,10 +24,7 @@
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
 header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;
   padding:12px max(16px,calc((100% - 1200px)/2));background:var(--bar);border-bottom:1px solid var(--line)}
-.brand{display:flex;flex-direction:column;gap:3px;min-width:0}
-.mark{font-size:13px;letter-spacing:.22em;text-transform:uppercase;white-space:nowrap}
-.mark b{color:var(--accent-hi);font-weight:400}
-.sub{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.logo{display:block;height:44px;width:auto}
 .tools{display:flex;align-items:center;gap:14px}
 #count{font-size:12px;letter-spacing:.08em;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .btn{font:inherit;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:var(--accent);
@@ -38,12 +35,12 @@ main{display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px
 .page{width:min(1200px,100%,calc((100vh - 100px) * 1.4144));background:#EDE9E1;border-radius:4px;
   box-shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35);overflow:hidden}
 .page img{display:block;width:100%;height:auto;aspect-ratio:3369/2382}
-@media (max-width:560px){.sub{display:none}.mark{font-size:11px;letter-spacing:.16em}#count{display:none}main{gap:10px;padding-top:12px}}
+@media (max-width:560px){.logo{height:36px}#count{display:none}main{gap:10px;padding-top:12px}}
 </style>
 </head>
 <body>
 <header>
-  <div class="brand"><div class="mark">Adada <b>&amp;</b> Kabbani</div><div class="sub">Company Profile 2026</div></div>
+  <img class="logo" src="logo.svg" alt="Adada &amp; Kabbani" width="112" height="44">
   <div class="tools"><span id="count" aria-live="polite">1 / 144</span>
     <a class="btn" href="../adada-kabbani-2026-company-profile.pdf" download="Adada-Kabbani-Company-Profile-2026.pdf">Download PDF</a></div>
 </header>
