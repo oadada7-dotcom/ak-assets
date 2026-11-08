@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adada &amp; Kabbani · Company Profile 2026</title>
+<meta name="description" content="Adada &amp; Kabbani company profile, 2026 edition. Luxury woodwork, joinery, kitchens and interior fit-out since 1959, Makkah.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Adada &amp; Kabbani · Company Profile 2026">
+<meta property="og:description" content="Luxury woodwork, joinery, kitchens and interior fit-out since 1959, Makkah.">
+<meta property="og:image" content="https://oadada7-dotcom.github.io/ak-assets/adada-kabbani-2026-company-profile/cover.jpg">
+<meta property="og:url" content="https://oadada7-dotcom.github.io/ak-assets/adada-kabbani-2026-company-profile/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23922133'/%3E%3Ctext x='16' y='22' font-family='Optima,serif' font-size='16' fill='%23F4F1EA' text-anchor='middle'%3Eak%3C/text%3E%3C/svg%3E">
+<style>
+/* One visual world: a quiet reading room for a landscape A4 profile. Pages sit centred on warm charcoal; oxblood marks the one action. */
+:root{
+  --bg:#1C1A19; --bar:#141312; --ink:#F4F1EA; --muted:#AEA79D; --line:rgba(244,241,234,.12); --accent:#922133; --accent-hi:#A8283D;
+  --font:Optima,"Optima Nova",Candara,"Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:12px max(16px,calc((100% - 1200px)/2));background:var(--bar);border-bottom:1px solid var(--line)}
+.brand{display:flex;flex-direction:column;gap:3px;min-width:0}
+.mark{font-size:13px;letter-spacing:.22em;text-transform:uppercase;white-space:nowrap}
+.mark b{color:var(--accent-hi);font-weight:400}
+.sub{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.tools{display:flex;align-items:center;gap:14px}
+#count{font-size:12px;letter-spacing:.08em;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.btn{font:inherit;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:var(--accent);
+  border:0;border-radius:999px;padding:9px 16px;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn:hover{background:var(--accent-hi)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+#progress{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--accent-hi);transition:width .2s}
+main{display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px 16px 48px}
+#status{max-width:1200px;width:100%;font-size:14px;color:var(--muted);text-align:center;padding:24px 0}
+#status a{color:var(--ink)}
+.page{position:relative;width:min(1200px,100%,calc((100dvh - 100px) * 1.4143));aspect-ratio:var(--ar,842/595.5);background:#F4F1EA;border-radius:4px;
+  box-shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35);overflow:hidden}
+.page canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+@media (max-width:560px){.sub{display:none}.mark{font-size:11px;letter-spacing:.16em}#count{display:none}main{gap:10px;padding-top:12px}}
+@media (prefers-reduced-motion:reduce){#progress{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="mark">Adada <b>&amp;</b> Kabbani</div><div class="sub">Company Profile 2026</div></div>
+  <div class="tools"><span id="count" aria-live="polite"></span>
+    <a class="btn" id="dl" href="../adada-kabbani-2026-company-profile.pdf" download="Adada-Kabbani-Company-Profile-2026.pdf">Download PDF</a></div>
+  <div id="progress" aria-hidden="true"></div>
+</header>
+<main id="pages">
+  <div id="status">Opening the company profile…</div>
+</main>
+<script src="pdf.min.js"></script>
+<script>
+(function(){
+  var PDF_URL = "../adada-kabbani-2026-company-profile.pdf";
+  var pagesEl = document.getElementById("pages"), statusEl = document.getElementById("status");
+  var countEl = document.getElementById("count"), bar = document.getElementById("progress");
+  var total = 0, pdf = null;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "pdf.worker.min.js";
+
+  function fail(){
+    statusEl.innerHTML = 'The profile couldn’t be displayed here. <a href="' + PDF_URL + '">Open the PDF directly</a>.';
+    statusEl.hidden = false; bar.style.width = "0";
+  }
+
+  // Render a page when it comes near the screen; drop its canvas when it is far away, so phones keep memory free.
+  function show(h){
+    if(h.dataset.state) return;
+    var n = +h.dataset.n; h.dataset.state = "rendering";
+    pdf.getPage(n).then(function(page){
+      if(h.dataset.state !== "rendering") return;
+      var base = page.getViewport({scale:1});
+      var dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+      var vp = page.getViewport({scale: Math.max(1, h.clientWidth * dpr / base.width)});
+      var c = document.createElement("canvas"); c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+      c.setAttribute("role", "img"); c.setAttribute("aria-label", "Page " + n + " of " + total);
+      var task = page.render({canvasContext: c.getContext("2d"), viewport: vp});
+      h._task = task;
+      return task.promise.then(function(){
+        h._task = null;
+        if(h.dataset.state !== "rendering"){ c.width = c.height = 0; return; }
+        h.textContent = ""; h.appendChild(c); h.dataset.state = "done";
+      });
+    }).catch(function(){ if(h.dataset.state === "rendering") h.dataset.state = ""; });
+  }
+  function hide(h){
+    if(!h.dataset.state) return;
+    if(h._task){ try{ h._task.cancel(); }catch(e){} h._task = null; }
+    var c = h.querySelector("canvas"); if(c){ c.width = c.height = 0; c.remove(); }
+    h.dataset.state = "";
+  }
+
+  pdfjsLib.getDocument({url: PDF_URL, rangeChunkSize: 1048576, disableAutoFetch: true, disableStream: true}).promise
+  .then(async function(doc){
+    pdf = doc; total = pdf.numPages;
+    var first = (await pdf.getPage(1)).getViewport({scale:1});
+    document.documentElement.style.setProperty("--ar", first.width + "/" + first.height);
+    statusEl.hidden = true;
+    var holders = [];
+    for(var i = 1; i <= total; i++){
+      var h = document.createElement("section"); h.className = "page"; h.id = "p" + i; h.dataset.n = i;
+      pagesEl.appendChild(h); holders.push(h);
+    }
+    countEl.textContent = "1 / " + total;
+    if("IntersectionObserver" in window){
+      var near = new IntersectionObserver(function(es){
+        es.forEach(function(e){ if(e.isIntersecting) show(e.target); else hide(e.target); });
+      }, {rootMargin: "1200px 0px"});
+      holders.forEach(function(h){ near.observe(h); });
+      var mid = new IntersectionObserver(function(es){
+        es.forEach(function(e){ if(e.isIntersecting) countEl.textContent = e.target.dataset.n + " / " + total; });
+      }, {rootMargin: "-45% 0px -45% 0px"});
+      holders.forEach(function(h){ mid.observe(h); });
+    } else { holders.slice(0, 4).forEach(show); }
+    var m = /^#p(\d+)$/.exec(location.hash);
+    if(m){ var t = document.getElementById("p" + m[1]); if(t) t.scrollIntoView(); }
+  }, fail);
+})();
+</script>
+</body>
+</html>
